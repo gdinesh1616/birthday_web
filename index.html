@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday! ✨</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Great+Vibes&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,800;1,400&display=swap" rel="stylesheet">
+    
+    <!-- Canvas Confetti CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Ambient Canvas for Glowing Red Embers & Particles -->
+    <canvas id="ambient-canvas"></canvas>
+
+    <!-- Rising Balloons Container -->
+    <div id="balloons-container" aria-hidden="true"></div>
+
+    <!-- Floating Audio & Navigation Bar -->
+    <nav class="floating-nav" id="floating-nav">
+        <div class="nav-brand">
+            <span class="pulse-dot"></span>
+            <span id="nav-queen-tag">Birthday Queen</span>
+        </div>
+        
+        <div class="nav-actions">
+            <!-- Music Player Button -->
+            <button class="music-toggle-btn" id="music-toggle" title="Play / Pause Birthday Music">
+                <span class="music-bars">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </span>
+                <span class="music-label" id="music-label">Play Music</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Quick Section Dots -->
+    <div class="section-indicator">
+        <a href="#section-cake" class="dot active" data-tooltip="The Cake" aria-label="Go to Cake section" id="dot-cake"></a>
+        <a href="#section-letter" class="dot locked" data-tooltip="The Letter (Locked 🔒)" aria-label="Go to Letter section" id="dot-letter"></a>
+        <a href="#section-quiz" class="dot locked" data-tooltip="The Quiz (Locked 🔒)" aria-label="Go to Quiz section" id="dot-quiz"></a>
+        <a href="#section-memories" class="dot locked" data-tooltip="Memories (Locked 🔒)" aria-label="Go to Memories section" id="dot-memories"></a>
+    </div>
+
+    <!-- MAIN WRAPPER -->
+    <main class="page-container">
+
+        <!-- ========================================================
+             SECTION 1: THE CAKE & CELEBRATION
+             ======================================================== -->
+        <section id="section-cake" class="hero-section">
+            <div class="glow-orb orb-1"></div>
+            <div class="glow-orb orb-2"></div>
+
+            <div class="hero-badge">
+                <span class="sparkle-icon">✨</span>
+                <span>A Midnight Celebration Just For You</span>
+                <span class="sparkle-icon">✨</span>
+            </div>
+
+            <h1 class="hero-title">
+                Happy Birthday, <span class="neon-text-crimson" id="hero-friend-name">My Bestie</span>!
+            </h1>
+            <p class="hero-subtitle">
+                Make your secret wish, blow the candles, and let's slice into this celebration!
+            </p>
+
+            <!-- CAKE STAGE -->
+            <div class="cake-stage">
+                <!-- Interactive Animated Cake -->
+                <div class="cake-wrapper" id="cake-wrapper">
+                    <!-- Candles on top -->
+                    <div class="candles-rack">
+                        <div class="candle c1">
+                            <div class="flame-wrapper"><div class="candle-flame"></div></div>
+                            <div class="candle-stick"></div>
+                        </div>
+                        <div class="candle c2">
+                            <div class="flame-wrapper"><div class="candle-flame"></div></div>
+                            <div class="candle-stick"></div>
+                        </div>
+                        <div class="candle c3">
+                            <div class="flame-wrapper"><div class="candle-flame"></div></div>
+                            <div class="candle-stick"></div>
+                        </div>
+                        <div class="candle c4">
+                            <div class="flame-wrapper"><div class="candle-flame"></div></div>
+                            <div class="candle-stick"></div>
+                        </div>
+                        <div class="candle c5">
+                            <div class="flame-wrapper"><div class="candle-flame"></div></div>
+                            <div class="candle-stick"></div>
+                        </div>
+                    </div>
+
+                    <!-- Glowing Knife (Appears on cut step) -->
+                    <div class="knife-element" id="cake-knife">
+                        <div class="knife-blade"></div>
+                        <div class="knife-handle"></div>
+                        <div class="knife-glow"></div>
+                    </div>
+
+                    <!-- Cake Tiers -->
+                    <div class="cake-tier tier-top">
+                        <div class="frosting-layer">
+                            <div class="drip drip-1"></div>
+                            <div class="drip drip-2"></div>
+                            <div class="drip drip-3"></div>
+                            <div class="drip drip-4"></div>
+                        </div>
+                        <div class="tier-body">
+                            <div class="berry-toppings">🍓 🍒 🍓</div>
+                        </div>
+                    </div>
+
+                    <div class="cake-tier tier-middle">
+                        <div class="frosting-layer">
+                            <div class="drip drip-1"></div>
+                            <div class="drip drip-2"></div>
+                            <div class="drip drip-3"></div>
+                        </div>
+                        <div class="tier-body">
+                            <div class="piping-dots">
+                                <span></span><span></span><span></span><span></span><span></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="cake-tier tier-bottom" id="tier-bottom">
+                        <div class="frosting-layer">
+                            <div class="drip drip-1"></div>
+                            <div class="drip drip-2"></div>
+                            <div class="drip drip-3"></div>
+                            <div class="drip drip-4"></div>
+                        </div>
+                        <div class="tier-body">
+                            <!-- Cuttable slice element -->
+                            <div class="cake-slice-piece" id="cut-slice"></div>
+                            <div class="piping-dots">
+                                <span></span><span></span><span></span><span></span><span></span><span></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Cake Stand -->
+                    <div class="cake-plate"></div>
+                    <div class="plate-pedestal"></div>
+                </div>
+
+                <!-- Interactive Buttons -->
+                <div class="cake-controls">
+                    <button class="btn-neon btn-blow" id="btn-blow">
+                        <span class="btn-icon">💨</span>
+                        <span class="btn-text">Make a Wish & Blow Candles</span>
+                    </button>
+                    
+                    <button class="btn-neon btn-cut disabled" id="btn-cut" disabled>
+                        <span class="btn-icon">🔪</span>
+                        <span class="btn-text">Cut the Birthday Cake!</span>
+                    </button>
+                </div>
+
+                <!-- Status Toast -->
+                <div class="interaction-toast" id="cake-status-msg">
+                    ✨ Tap "Blow Candles" to make your wish!
+                </div>
+
+                <!-- Post-Cut Unlock Button -->
+                <div class="unlock-prompt hidden" id="cake-unlock-prompt">
+                    <p class="celebrate-text">🎉 The party has officially started! 🎉</p>
+                    <a href="#section-letter" class="btn-neon btn-next-stage">
+                        <span>Read Your Letter</span>
+                        <span class="arrow-down">↓</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================
+             SECTION 2: THE CRIMSON ENVELOPE & LETTER
+             ======================================================== -->
+        <section id="section-letter" class="section-container section-locked">
+            <div class="section-header">
+                <span class="section-num">CHAPTER II</span>
+                <h2 class="section-title">A Letter From The Heart</h2>
+                <div class="title-underline"></div>
+            </div>
+
+            <div class="letter-stage">
+                <!-- 3D Envelope Container -->
+                <div class="envelope-wrapper" id="envelope-wrapper">
+                    <div class="envelope" id="envelope-box">
+                        <div class="envelope-back"></div>
+                        <div class="envelope-paper-preview"></div>
+                        <div class="envelope-pocket"></div>
+                        <div class="envelope-flap" id="envelope-flap"></div>
+                        
+                        <!-- Wax Seal -->
+                        <div class="wax-seal" id="wax-seal" title="Click to break the seal and open">
+                            <div class="seal-inner">
+                                <span class="seal-emblem">❤️</span>
+                            </div>
+                            <span class="seal-hint">Click to Open</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Unfolded Letter Container -->
+                <div class="opened-letter-container hidden" id="opened-letter">
+                    <div class="letter-parchment">
+                        <button class="skip-typing-btn hidden" id="skip-typing-btn" type="button">⚡ Show Full Letter</button>
+                        <div class="parchment-glow"></div>
+                        <div class="letter-decorations-top">
+                            <span class="ornament">✦ ✦ ✦</span>
+                        </div>
+
+                        <div class="letter-salutation" id="letter-salutation">
+                            Dearest,
+                        </div>
+
+                        <div class="letter-body" id="letter-body">
+                            <!-- Injected by script.js with typewriter effect -->
+                        </div>
+
+                        <div class="letter-closing hidden" id="letter-closing">
+                            <p id="letter-signoff">With all my love and best wishes,</p>
+                            <h3 class="letter-signature" id="letter-signature">Dinesh</h3>
+                        </div>
+
+                        <div class="letter-decorations-bottom">
+                            <span class="ornament">✦ ✦ ✦</span>
+                        </div>
+                    </div>
+
+                    <!-- Polaroids Tucked on the Side -->
+                    <div class="letter-polaroids hidden" id="letter-polaroids">
+                        <div class="polaroid-item p-left">
+                            <div class="polaroid-pin"></div>
+                            <div class="polaroid-img-box">
+                                <img src="https://images.unsplash.com/photo-1517457373958-b7bdd4587205?auto=format&fit=crop&w=600&q=80" alt="Special memory" loading="lazy">
+                            </div>
+                            <span class="polaroid-caption">Pure Joy ✨</span>
+                        </div>
+                        <div class="polaroid-item p-right">
+                            <div class="polaroid-pin"></div>
+                            <div class="polaroid-img-box">
+                                <img src="https://images.unsplash.com/photo-1513151233558-d860c5398176?auto=format&fit=crop&w=600&q=80" alt="Celebration" loading="lazy">
+                            </div>
+                            <span class="polaroid-caption">Memories We Keep 💖</span>
+                        </div>
+                    </div>
+
+                    <!-- Next Button -->
+                    <div class="center-cta hidden" id="letter-cta-container">
+                        <a href="#section-quiz" class="btn-neon btn-next-stage">
+                            <span>Ready For The Quiz?</span>
+                            <span class="arrow-down">↓</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================
+             SECTION 3: FRIENDSHIP TRIVIA & QUESTIONS
+             ======================================================== -->
+        <section id="section-quiz" class="section-container section-locked">
+            <div class="section-header">
+                <span class="section-num">CHAPTER III</span>
+                <h2 class="section-title">The "How Well Do You Know Us" Quiz</h2>
+                <div class="title-underline"></div>
+                <p class="section-desc">A few playful questions to test your memory (and see who is really the trouble maker!)</p>
+            </div>
+
+            <div class="quiz-container">
+                <!-- Quiz Card -->
+                <div class="quiz-card" id="quiz-card">
+                    <!-- Progress Bar -->
+                    <div class="quiz-header">
+                        <div class="quiz-badge" id="quiz-counter">Question 1 of 4</div>
+                        <div class="quiz-progress-track">
+                            <div class="quiz-progress-fill" id="quiz-progress-bar" style="width: 25%;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Question Prompt -->
+                    <h3 class="quiz-question-text" id="quiz-question-title">
+                        Loading question...
+                    </h3>
+
+                    <!-- Options Grid -->
+                    <div class="quiz-options-grid" id="quiz-options-container">
+                        <!-- Options generated by script.js -->
+                    </div>
+
+                    <!-- Feedback Banner -->
+                    <div class="quiz-feedback hidden" id="quiz-feedback-box">
+                        <span class="feedback-icon" id="feedback-icon">🎉</span>
+                        <span class="feedback-text" id="feedback-text">Awesome answer!</span>
+                    </div>
+
+                    <!-- Next Question CTA -->
+                    <div class="quiz-actions hidden" id="quiz-action-container">
+                        <button class="btn-neon" id="quiz-next-btn">Next Question →</button>
+                    </div>
+                </div>
+
+                <!-- Quiz Completion Card (Hidden until finished) -->
+                <div class="quiz-card quiz-results-card hidden" id="quiz-results-card">
+                    <div class="trophy-badge">🏆</div>
+                    <h3 class="result-title">Certified Best Friend Forever!</h3>
+                    <p class="result-message">
+                        No matter the score, you passed with flying colors because you're simply the best. Now, let's step into our memory vault!
+                    </p>
+                    <a href="#section-memories" class="btn-neon btn-next-stage" id="quiz-unlock-timeline-btn">
+                        <span>Unlock Memory Timeline</span>
+                        <span class="arrow-down">↓</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================
+             SECTION 4: TIMELINE OF MEMORIES & WORDS FOR ME
+             ======================================================== -->
+        <section id="section-memories" class="section-container section-locked">
+            <div class="section-header">
+                <span class="section-num">CHAPTER IV</span>
+                <h2 class="section-title">Timeline of Our Journey</h2>
+                <div class="title-underline"></div>
+                <p class="section-desc">Some milestones, laughter, and timeless memories we have created together.</p>
+            </div>
+
+            <!-- Dynamic Timeline Container -->
+            <div class="timeline-wrapper">
+                <div class="timeline-spine"></div>
+                <div class="timeline-items" id="timeline-container">
+                    <!-- Injected by script.js from config.timeline -->
+                </div>
+            </div>
+
+            <!-- PART B: HER NOTE FOR ME (SENT TO EMAIL) -->
+            <div class="reply-letter-section" id="note-for-me">
+                <div class="reply-card">
+                    <div class="reply-card-glow"></div>
+                    <div class="reply-header">
+                        <span class="reply-tag">YOUR TURN 💌</span>
+                        <h3 class="reply-title">Leave a Note for <span class="neon-text-crimson">Dinesh</span></h3>
+                        <p class="reply-subtitle">
+                            Tell me what's on your mind, your favorite memory of us, or anything you've ever wanted to say. It will be delivered directly to my email!
+                        </p>
+                    </div>
+
+                    <form class="reply-form" id="reply-form">
+                        <!-- Mood Picker -->
+                        <div class="form-group">
+                            <label class="form-label">How are you feeling right now?</label>
+                            <div class="mood-selector" id="mood-selector">
+                                <button type="button" class="mood-btn active" data-mood="🥰 Loved">🥰 Loved</button>
+                                <button type="button" class="mood-btn" data-mood="🥳 Hyped">🥳 Hyped</button>
+                                <button type="button" class="mood-btn" data-mood="😂 Laughing">😂 Laughing</button>
+                                <button type="button" class="mood-btn" data-mood="💖 Emotional">💖 Emotional</button>
+                                <button type="button" class="mood-btn" data-mood="✨ Blessed">✨ Blessed</button>
+                            </div>
+                            <input type="hidden" name="mood" id="selected-mood-input" value="🥰 Loved">
+                        </div>
+
+                        <!-- Favorite memory with me -->
+                        <div class="form-group">
+                            <label for="input-fav-memory" class="form-label">A memory of us you'll never forget:</label>
+                            <input type="text" id="input-fav-memory" name="favorite_memory" class="form-input" placeholder="e.g. That time when we..." required>
+                        </div>
+
+                        <!-- Thoughts / Letter to me -->
+                        <div class="form-group">
+                            <label for="input-message" class="form-label">Your message for me:</label>
+                            <textarea id="input-message" name="message" class="form-textarea" rows="5" placeholder="Write anything from the heart..." required></textarea>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="form-actions">
+                            <button type="submit" class="btn-neon btn-submit" id="btn-submit-note">
+                                <span class="submit-spinner hidden" id="submit-spinner"></span>
+                                <span class="btn-icon">💌</span>
+                                <span class="btn-text" id="btn-submit-text">Send This Note To Dinesh</span>
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- Feedback message container -->
+                    <div class="form-feedback-box hidden" id="form-feedback-box">
+                        <div class="feedback-icon">🎉</div>
+                        <h4 class="feedback-head" id="form-feedback-head">Note Sent Successfully!</h4>
+                        <p class="feedback-desc" id="form-feedback-desc">
+                            Your lovely message has been dispatched to Dinesh's inbox. Thank you for making this day so unforgettable!
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Image Lightbox Modal -->
+    <div class="lightbox-modal hidden" id="lightbox-modal">
+        <button class="lightbox-close" id="lightbox-close">&times;</button>
+        <div class="lightbox-content">
+            <img src="" alt="Enlarged view" id="lightbox-img">
+            <div class="lightbox-caption" id="lightbox-caption"></div>
+        </div>
+    </div>
+
+    <!-- Celebration Banner / Toast -->
+    <div class="toast-notification" id="toast-notification"></div>
+
+    <!-- Footer -->
+    <footer class="page-footer">
+        <p>Made with all my heart for your special day ❤️</p>
+        <span class="footer-sign">Dinesh &copy; 2026</span>
+    </footer>
+
+    <!-- Configuration Script -->
+    <script src="config.js"></script>
+    <!-- Application Logic -->
+    <script src="script.js"></script>
+</body>
+</html>
