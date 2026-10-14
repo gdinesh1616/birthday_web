@@ -9,18 +9,37 @@ const CONFIG = {
     // ------------------------------------------
     friendName: "Nandhitha", // Change this to her name (e.g. "Ananya", "Sneha", etc.)
     friendNickname: "Nandu", 
-    senderName: "Kireeti",            // Your name
+    senderName: "Dinesh, Kireeti & Bhargavi",            // Your names
     birthdayDate: "15/10",
 
     // ------------------------------------------
-    // 2. Email Delivery Configuration (Section 4)
+    // 2. Personal Email Delivery Configuration (Section 4)
     // ------------------------------------------
-    // To receive her letter directly in your email:
-    // 1. Go to https://formspree.io (100% free)
-    // 2. Create a new form and copy the endpoint URL (e.g. "https://formspree.io/f/xknqyzab")
-    // 3. Paste the URL here:
-    formspreeEndpoint: "https://formspree.io/f/xjygeadw", // e.g. "https://formspree.io/f/your_form_id"
-    yourEmail: "gdinesh1616@gmail.com", // Fallback email address
+    // She can choose whom to send her personal note to (Dinesh, Kireeti, or Bhargavi)!
+    // Each person's note will be delivered directly to their own inbox.
+    // Replace the email placeholders below with Kireeti and Bhargavi's real email addresses:
+    recipients: {
+        dinesh: {
+            name: "Dinesh",
+            avatar: "👑",
+            email: "gdinesh1616@gmail.com",
+            formspreeEndpoint: "https://formspree.io/f/xjygeadw" // Dinesh's active endpoint
+        },
+        kireeti: {
+            name: "Kireeti",
+            avatar: "⚡",
+            email: "krishnakireeti.n@gmail.com", // <-- REPLACE with Kireeti's actual email
+            formspreeEndpoint: "" // Optional: paste Kireeti's Formspree endpoint if created
+        },
+        bhargavi: {
+            name: "Bhargavi",
+            avatar: "🌸",
+            email: "bhargavi_email@gmail.com", // <-- REPLACE with Bhargavi's actual email
+            formspreeEndpoint: "" // Optional: paste Bhargavi's Formspree endpoint if created
+        }
+    },
+    // Global fallback email
+    yourEmail: "gdinesh1616@gmail.com",
 
     // ------------------------------------------
     // 3. Audio & Music
@@ -35,13 +54,13 @@ const CONFIG = {
     letter: {
         salutation: "Dearest,",
         paragraphs: [
-            "Happy Birthday to someone who brings so much light, laughter, and genuine warmth into my life. On this special day, I wanted to create something truly unique just for you to celebrate how wonderful you are.",
-            "Through every high and low, every random late-night conversation, and all the silly moments we've shared, having you as a friend has been one of the greatest blessings. Your kindness, your spirit, and your smile make the world a much brighter place.",
+            "Happy Birthday to someone who brings so much light, laughter, and genuine warmth into all our lives! On this special day, we wanted to create something truly unique together just for you to celebrate how wonderful and irreplaceable you are.",
+            "Through every high and low, every late-night conversation, and all the crazy, silly moments we've shared, having you as our best friend has been one of our greatest blessings. Your kindness, your spirit, and your smile make our world a much brighter place.",
             "May this upcoming year bring you endless happiness, boundless adventures, success in everything your heart desires, and memories that make you smile whenever you look back.",
-            "Never forget how truly valued, appreciated, and cherished you are. Happy Birthday! ❤️"
+            "Never forget how truly valued, appreciated, and cherished you are by all three of us. Happy Birthday! ❤️"
         ],
-        signOff: "With all my love and best wishes,",
-        signature: "Kireeti"
+        signOff: "With all our love and warmest wishes,",
+        signature: "Dinesh, Kireeti & Bhargavi"
     },
 
     // ------------------------------------------
@@ -101,29 +120,36 @@ const CONFIG = {
         {
             date: "The Beginning",
             title: "Where It All Started",
-            description: "The very first time we crossed paths and started talking. Little did I know how important you would become in my life.",
-            image: "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=800&q=80",
+            description: "",
+            image: "assets/images/img_1.jpeg",
             tag: "Chapter 1"
         },
         {
             date: "Unforgettable Moments",
             title: "Endless Laughter & Crazy Stories",
-            description: "Remember that day we couldn't stop laughing over the most random nonsense? Moments like that are pure gold.",
-            image: "https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=800&q=80",
+            description: "Remember all those times we couldn't stop laughing over the most random nonsense? Moments like that with you are pure gold.",
+            image: "assets/images/img_2.jpeg",
             tag: "Good Times"
         },
         {
-            date: "Always There",
-            title: "Through Thick & Thin",
-            description: "No matter how busy life gets, knowing I can always count on your support and honesty means everything to me.",
-            image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80",
-            tag: "Gratitude"
+            date: "Little Her",
+            title: "The Little Girl You Were",
+            description: "A tiny glimpse of the little girl you once were, carrying the same beautiful smile that makes you special today.",
+            image: "assets/images/img_3.jpeg",
+            tag: "Childhood"
+        },
+        {
+            date: "Swag Since Day One",
+            title: "Born To Shine",
+            description: "Rocking the shades and that effortless cool charm from the very beginning!",
+            image: "assets/images/img_4.jpeg",
+            tag: "Childhood"
         },
         {
             date: "Today & Forever",
             title: "Celebrating Another Year of You",
-            description: "Here's to celebrating you today, and looking forward to many more amazing years and unforgettable memories together!",
-            image: "https://images.unsplash.com/photo-1464349095431-e9a21285b5f3?auto=format&fit=crop&w=800&q=80",
+            description: "",
+            image: "assets/images/img_5.jpeg",
             tag: "Happy Birthday"
         }
     ]

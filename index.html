@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Happy Birthday! ✨</title>
     
     <!-- Google Fonts -->
@@ -22,6 +22,9 @@
 
     <!-- Rising Balloons Container -->
     <div id="balloons-container" aria-hidden="true"></div>
+
+    <!-- Ambient Screen Flash for Firecrackers -->
+    <div id="cracker-flash" class="cracker-flash" aria-hidden="true"></div>
 
     <!-- Floating Audio & Navigation Bar -->
     <nav class="floating-nav" id="floating-nav">
@@ -64,15 +67,15 @@
 
             <div class="hero-badge">
                 <span class="sparkle-icon">✨</span>
-                <span>A Midnight Celebration Just For You</span>
+                <span>A Birthday Surprise From Dinesh, Kireeti &amp; Bhargavi</span>
                 <span class="sparkle-icon">✨</span>
             </div>
 
             <h1 class="hero-title">
-                Happy Birthday, <span class="neon-text-crimson" id="hero-friend-name">My Bestie</span>!
+                Happy Birthday, <span class="neon-text-crimson" id="hero-friend-name">Our Bestie</span>!
             </h1>
             <p class="hero-subtitle">
-                Make your secret wish, blow the candles, and let's slice into this celebration!
+                Make your secret wish, blow the candles, and let's slice into this celebration together!
             </p>
 
             <!-- CAKE STAGE -->
@@ -192,7 +195,7 @@
         <section id="section-letter" class="section-container section-locked">
             <div class="section-header">
                 <span class="section-num">CHAPTER II</span>
-                <h2 class="section-title">A Letter From The Heart</h2>
+                <h2 class="section-title">A Letter From Our Hearts</h2>
                 <div class="title-underline"></div>
             </div>
 
@@ -233,8 +236,8 @@
                         </div>
 
                         <div class="letter-closing hidden" id="letter-closing">
-                            <p id="letter-signoff">With all my love and best wishes,</p>
-                            <h3 class="letter-signature" id="letter-signature">Dinesh</h3>
+                            <p id="letter-signoff">With all our love and warmest wishes,</p>
+                            <h3 class="letter-signature" id="letter-signature">Dinesh, Kireeti &amp; Bhargavi</h3>
                         </div>
 
                         <div class="letter-decorations-bottom">
@@ -247,16 +250,16 @@
                         <div class="polaroid-item p-left">
                             <div class="polaroid-pin"></div>
                             <div class="polaroid-img-box">
-                                <img src="https://images.unsplash.com/photo-1517457373958-b7bdd4587205?auto=format&fit=crop&w=600&q=80" alt="Special memory" loading="lazy">
+                                <img src="./assets/images/polaroid_1.jpeg" alt="Special memory" loading="lazy">
                             </div>
                             <span class="polaroid-caption">Pure Joy ✨</span>
                         </div>
                         <div class="polaroid-item p-right">
                             <div class="polaroid-pin"></div>
                             <div class="polaroid-img-box">
-                                <img src="https://images.unsplash.com/photo-1513151233558-d860c5398176?auto=format&fit=crop&w=600&q=80" alt="Celebration" loading="lazy">
+                                <img src="./assets/images/polaroid_2.jpeg" alt="Celebration" loading="lazy">
                             </div>
-                            <span class="polaroid-caption">Memories We Keep 💖</span>
+                            <span class="polaroid-caption">Memories we keep💖</span>
                         </div>
                     </div>
 
@@ -349,19 +352,39 @@
                 </div>
             </div>
 
-            <!-- PART B: HER NOTE FOR ME (SENT TO EMAIL) -->
+            <!-- PART B: HER NOTE FOR US (SENT TO EMAIL) -->
             <div class="reply-letter-section" id="note-for-me">
                 <div class="reply-card">
                     <div class="reply-card-glow"></div>
                     <div class="reply-header">
                         <span class="reply-tag">YOUR TURN 💌</span>
-                        <h3 class="reply-title">Leave a Note for <span class="neon-text-crimson">Dinesh</span></h3>
+                        <h3 class="reply-title">Leave a Personal Note for <span class="neon-text-crimson" id="reply-title-target">Dinesh</span></h3>
                         <p class="reply-subtitle">
-                            Tell me what's on your mind, your favorite memory of us, or anything you've ever wanted to say. It will be delivered directly to my email!
+                            Choose who this message is for below. It will be delivered directly to their personal inbox!
                         </p>
                     </div>
 
                     <form class="reply-form" id="reply-form">
+                        <!-- Recipient Picker (Dinesh, Kireeti, Bhargavi) -->
+                        <div class="form-group recipient-group">
+                            <label class="form-label">Choose who this message is for: ✨</label>
+                            <div class="recipient-selector" id="recipient-selector">
+                                <button type="button" class="recipient-chip active" data-recipient="dinesh">
+                                    <span class="chip-avatar">👑</span>
+                                    <span class="chip-name">Dinesh</span>
+                                </button>
+                                <button type="button" class="recipient-chip" data-recipient="kireeti">
+                                    <span class="chip-avatar">⚡</span>
+                                    <span class="chip-name">Kireeti</span>
+                                </button>
+                                <button type="button" class="recipient-chip" data-recipient="bhargavi">
+                                    <span class="chip-avatar">🌸</span>
+                                    <span class="chip-name">Bhargavi</span>
+                                </button>
+                            </div>
+                            <input type="hidden" name="recipient" id="selected-recipient-input" value="dinesh">
+                        </div>
+
                         <!-- Mood Picker -->
                         <div class="form-group">
                             <label class="form-label">How are you feeling right now?</label>
@@ -375,16 +398,16 @@
                             <input type="hidden" name="mood" id="selected-mood-input" value="🥰 Loved">
                         </div>
 
-                        <!-- Favorite memory with me -->
+                        <!-- Favorite memory with the selected person -->
                         <div class="form-group">
-                            <label for="input-fav-memory" class="form-label">A memory of us you'll never forget:</label>
-                            <input type="text" id="input-fav-memory" name="favorite_memory" class="form-input" placeholder="e.g. That time when we..." required>
+                            <label for="input-fav-memory" class="form-label">A memory with <span id="target-recipient-mem-name">Dinesh</span> you'll never forget:</label>
+                            <input type="text" id="input-fav-memory" name="favorite_memory" class="form-input" placeholder="e.g. That time when Dinesh and I..." required>
                         </div>
 
-                        <!-- Thoughts / Letter to me -->
+                        <!-- Thoughts / Letter to the selected person -->
                         <div class="form-group">
-                            <label for="input-message" class="form-label">Your message for me:</label>
-                            <textarea id="input-message" name="message" class="form-textarea" rows="5" placeholder="Write anything from the heart..." required></textarea>
+                            <label for="input-message" class="form-label">Your message for <span id="target-recipient-msg-name">Dinesh</span>:</label>
+                            <textarea id="input-message" name="message" class="form-textarea" rows="5" placeholder="Write anything from the heart for Dinesh..." required></textarea>
                         </div>
 
                         <!-- Submit Button -->
@@ -402,8 +425,12 @@
                         <div class="feedback-icon">🎉</div>
                         <h4 class="feedback-head" id="form-feedback-head">Note Sent Successfully!</h4>
                         <p class="feedback-desc" id="form-feedback-desc">
-                            Your lovely message has been dispatched to Dinesh's inbox. Thank you for making this day so unforgettable!
+                            Your lovely message has been dispatched directly to Dinesh's inbox.
                         </p>
+                        <button type="button" class="btn-neon btn-write-another" id="btn-write-another">
+                            <span class="btn-icon">💌</span>
+                            <span>Send a Note to Another Friend</span>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -425,8 +452,8 @@
 
     <!-- Footer -->
     <footer class="page-footer">
-        <p>Made with all my heart for your special day ❤️</p>
-        <span class="footer-sign">Dinesh &copy; 2026</span>
+        <p>Made with all our love for your special day ❤️</p>
+        <span class="footer-sign">Dinesh, Kireeti &amp; Bhargavi &copy; 2026</span>
     </footer>
 
     <!-- Configuration Script -->

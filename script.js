@@ -69,8 +69,14 @@ function setupPersonalization() {
     if (CONFIG.letter) {
         if (letterSalutation) letterSalutation.textContent = "";
         if (letterBody) letterBody.innerHTML = "";
-        if (letterSignoff) letterSignoff.textContent = CONFIG.letter.signOff || "With all my love,";
-        if (letterSignature) letterSignature.textContent = CONFIG.letter.signature || CONFIG.senderName || "Dinesh";
+        if (letterSignoff) letterSignoff.textContent = CONFIG.letter.signOff || "With all our love and warmest wishes,";
+        if (letterSignature) letterSignature.textContent = CONFIG.letter.signature || CONFIG.senderName || "Dinesh, Kireeti & Bhargavi";
+    }
+
+    // Dynamic Footer Signature
+    const footerSign = document.querySelector('.footer-sign');
+    if (footerSign && CONFIG.senderName) {
+        footerSign.innerHTML = `${escapeHTML(CONFIG.senderName)} &copy; 2026`;
     }
 }
 
@@ -98,7 +104,8 @@ function initAmbientCanvas() {
     });
 
     const particles = [];
-    const particleCount = Math.min(width > 768 ? 60 : 30, 80);
+    const isMobileDevice = width <= 768;
+    const particleCount = isMobileDevice ? 18 : 55;
 
     for (let i = 0; i < particleCount; i++) {
         particles.push({
@@ -130,8 +137,10 @@ function initAmbientCanvas() {
             ctx.beginPath();
             ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
             ctx.fillStyle = `rgba(${p.color}, ${p.opacity})`;
-            ctx.shadowBlur = 10;
-            ctx.shadowColor = `rgb(${p.color})`;
+            if (!isMobileDevice) {
+                ctx.shadowBlur = 8;
+                ctx.shadowColor = `rgb(${p.color})`;
+            }
             ctx.fill();
         });
 
@@ -327,6 +336,60 @@ function playTypewriterTick() {
     } catch (e) {}
 }
 
+// Sound FX: Firecracker Blast & Crackling Sparks
+function playFirecrackerBlastSound() {
+    if (!audioCtx) getAudioContext();
+    if (!audioCtx) return;
+
+    try {
+        const now = audioCtx.currentTime;
+
+        // 1. Initial Thump / Boom
+        const boomOsc = audioCtx.createOscillator();
+        const boomGain = audioCtx.createGain();
+        boomOsc.type = 'sine';
+        boomOsc.frequency.setValueAtTime(140, now);
+        boomOsc.frequency.exponentialRampToValueAtTime(30, now + 0.25);
+
+        boomGain.gain.setValueAtTime(0.28, now);
+        boomGain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+
+        boomOsc.connect(boomGain);
+        boomGain.connect(audioCtx.destination);
+        boomOsc.start(now);
+        boomOsc.stop(now + 0.3);
+
+        // 2. Crackling burst (7-9 crispy snaps)
+        const popCount = 8;
+        for (let i = 0; i < popCount; i++) {
+            const popTime = now + 0.03 + (i * 0.032) + (Math.random() * 0.025);
+            const bufferSize = Math.floor(audioCtx.sampleRate * 0.025);
+            const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+            const data = buffer.getChannelData(0);
+            for (let j = 0; j < bufferSize; j++) {
+                data[j] = (Math.random() * 2 - 1) * Math.exp(-j / (bufferSize * 0.35));
+            }
+
+            const noise = audioCtx.createBufferSource();
+            noise.buffer = buffer;
+
+            const filter = audioCtx.createBiquadFilter();
+            filter.type = 'highpass';
+            filter.frequency.setValueAtTime(1000 + Math.random() * 1500, popTime);
+
+            const gain = audioCtx.createGain();
+            gain.gain.setValueAtTime(0.18, popTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, popTime + 0.025);
+
+            noise.connect(filter);
+            filter.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            noise.start(popTime);
+        }
+    } catch (e) {}
+}
+
 // --------------------------------------------------------------------------
 // 4. SECTION 1: CAKE CUTTING & GLOWING BALLOON CELEBRATION
 // --------------------------------------------------------------------------
@@ -389,6 +452,10 @@ function initCakeExperience() {
 
         setTimeout(() => {
             cutSlice.classList.add('sliced');
+            // Trigger spectacular firecrackers & fireworks blast!
+            triggerFirecrackerShow();
+            // Confetti Cannons
+            triggerBigConfetti();
         }, 500);
 
         btnCut.classList.add('disabled');
@@ -400,20 +467,16 @@ function initCakeExperience() {
             toggleMusic();
         }
 
-        // Trigger Big Celebration:
-        // 1. Confetti Cannons
-        triggerBigConfetti();
-
-        // 2. Rising Glowing Balloons
+        // Trigger Rising Glowing Balloons
         triggerBalloonStorm();
 
-        // 3. Unlock Next Section (Letter)
+        // Unlock Next Section (Letter)
         unlockSection('letter');
 
         setTimeout(() => {
             cakeUnlockPrompt.classList.remove('hidden');
             cakeUnlockPrompt.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }, 1200);
+        }, 2200);
 
         showToast("🎂 Cake sliced! Chapter II Letter unlocked! 💌");
     });
@@ -431,7 +494,8 @@ function createSmokePuff(parentElement) {
 function triggerBigConfetti() {
     if (typeof confetti !== 'function') return;
 
-    const count = 200;
+    const isMobile = window.innerWidth < 768;
+    const count = isMobile ? 90 : 200;
     const defaults = {
         origin: { y: 0.7 },
         colors: ['#ff0040', '#ff2b66', '#c40032', '#ffd166', '#ffffff', '#800020']
@@ -443,11 +507,115 @@ function triggerBigConfetti() {
         }));
     }
 
-    fire(0.25, { spread: 26, startVelocity: 55 });
+    fire(0.25, { spread: 26, startVelocity: isMobile ? 40 : 55 });
     fire(0.2, { spread: 60 });
     fire(0.35, { spread: 100, decay: 0.91, scalar: 0.8 });
     fire(0.1, { spread: 120, startVelocity: 25, decay: 0.92, scalar: 1.2 });
-    fire(0.1, { spread: 120, startVelocity: 45 });
+    if (!isMobile) {
+        fire(0.1, { spread: 120, startVelocity: 45 });
+    }
+}
+
+// Ambient Screen Flash for Firecracker Explosions
+let crackerFlashTimer = null;
+function triggerCrackerFlash() {
+    const flashEl = document.getElementById('cracker-flash');
+    if (!flashEl) return;
+
+    if (crackerFlashTimer) {
+        clearTimeout(crackerFlashTimer);
+    }
+    flashEl.classList.add('active');
+    crackerFlashTimer = setTimeout(() => {
+        flashEl.classList.remove('active');
+        crackerFlashTimer = null;
+    }, 90);
+}
+
+// Multi-Stage Firecracker Blasting Show (Sparks, Sounds, Flashes & Sky Aerials)
+function triggerFirecrackerShow() {
+    if (typeof confetti !== 'function') return;
+
+    const isMobile = window.innerWidth < 768;
+    const cakeContainer = document.querySelector('.cake-container') || document.querySelector('.cake-stand') || document.getElementById('cake-knife');
+
+    let cakeX = 0.5;
+    let cakeY = 0.62;
+    if (cakeContainer) {
+        const rect = cakeContainer.getBoundingClientRect();
+        if (rect.width > 0 && rect.height > 0) {
+            cakeX = Math.max(0.15, Math.min(0.85, (rect.left + rect.width / 2) / window.innerWidth));
+            cakeY = Math.max(0.2, Math.min(0.85, (rect.top + rect.height * 0.45) / window.innerHeight));
+        }
+    }
+
+    const crackerPalettes = [
+        ['#ffd700', '#ff0040', '#ffffff', '#ff9f1c', '#ff007f'], // Gold & Ruby Spark
+        ['#ff0055', '#4cc9f0', '#ffffff', '#ffd166', '#b5179e'], // Neon Rainbow Blast
+        ['#ff9900', '#ff3366', '#ffff80', '#ffffff', '#ff0033'], // Fiery Ember Cracker
+        ['#7209b7', '#f72585', '#4cc9f0', '#ffd700', '#ffffff'], // Electric Starlight
+        ['#ff0040', '#ffd700', '#ffffff', '#ff6b6b', '#ffe66d']  // Golden Grand Finale
+    ];
+
+    function fireSingleCrackerBurst(x, y, palette, particleMult = 1, isFountain = false) {
+        triggerCrackerFlash();
+        playFirecrackerBlastSound();
+
+        const baseCount = isMobile ? 45 : 85;
+        const count = Math.floor(baseCount * particleMult);
+
+        if (isFountain) {
+            // Upward spark fountain from the cake / ground
+            confetti({
+                particleCount: Math.floor(count * 0.8),
+                angle: 90,
+                spread: 65,
+                origin: { x, y },
+                startVelocity: isMobile ? 38 : 50,
+                decay: 0.92,
+                gravity: 1.15,
+                colors: palette,
+                shapes: ['circle', 'square'],
+                ticks: 200,
+                zIndex: 1000
+            });
+        }
+
+        // 360-degree radial crackle explosion
+        confetti({
+            particleCount: count,
+            angle: 90,
+            spread: 360,
+            origin: { x, y },
+            startVelocity: isMobile ? 26 : 38,
+            decay: 0.90,
+            gravity: 0.95,
+            scalar: 0.9,
+            colors: palette,
+            shapes: ['circle'],
+            ticks: 180,
+            zIndex: 1000
+        });
+    }
+
+    // Stage 1: Immediate explosive spark fountain bursting straight from the cake slice
+    fireSingleCrackerBurst(cakeX, cakeY, crackerPalettes[0], 1.25, true);
+
+    // Stage 2: Sequential Aerial Firecracker Bursts popping across the sky
+    const aerialBursts = [
+        { delay: 300, x: isMobile ? 0.25 : 0.22, y: 0.30, palette: crackerPalettes[1], mult: 0.9 },
+        { delay: 620, x: isMobile ? 0.75 : 0.78, y: 0.26, palette: crackerPalettes[2], mult: 0.95 },
+        { delay: 960, x: isMobile ? 0.32 : 0.36, y: 0.20, palette: crackerPalettes[3], mult: 1.0 },
+        { delay: 1300, x: isMobile ? 0.68 : 0.65, y: 0.23, palette: crackerPalettes[4], mult: 1.05 },
+        // Stage 3: Grand Finale Double Starburst at 1700ms
+        { delay: 1700, x: 0.50, y: 0.18, palette: crackerPalettes[0], mult: 1.35, isFountain: true }
+    ];
+
+    aerialBursts.forEach(burst => {
+        setTimeout(() => {
+            fireSingleCrackerBurst(burst.x, burst.y, burst.palette, burst.mult, !!burst.isFountain);
+        }, burst.delay);
+    });
 }
 
 // Glowing Colorful Balloons Release Engine
@@ -478,27 +646,52 @@ function triggerBalloonStorm() {
         { bg: 'radial-gradient(circle at 35% 35%, #ff0040, #9d0208, #370617)', glow: 'rgba(255, 0, 64, 0.85)' }
     ];
 
-    const balloonCount = window.innerWidth < 768 ? 26 : 42;
+    const isMobile = window.innerWidth < 480;
+    const isTablet = window.innerWidth < 768;
+    // Reduced balloon count for an airy, elegant, lag-free celebration
+    const balloonCount = isMobile ? 6 : (isTablet ? 10 : 16);
+    const staggerInterval = isMobile ? 320 : (isTablet ? 240 : 180);
 
     for (let i = 0; i < balloonCount; i++) {
         setTimeout(() => {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'balloon-wrapper';
+
             const b = document.createElement('div');
             b.className = 'balloon';
 
             const color = balloonColors[Math.floor(Math.random() * balloonColors.length)];
-            const size = Math.floor(Math.random() * 35) + 50; // 50px to 85px
-            const left = Math.random() * 95; // 0 to 95vw
-            const duration = Math.random() * 2.2 + 3.8; // 3.8s to 6.0s (faster and brisk!)
-            const sway = Math.random() * 12 + 6;
+            const size = isMobile 
+                ? Math.floor(Math.random() * 18) + 40   // 40px to 58px on mobile
+                : Math.floor(Math.random() * 26) + 48;  // 48px to 74px on desktop
+
+            // Keep within visible margins to prevent edge clipping
+            const minLeft = isMobile ? 8 : 5;
+            const maxLeft = isMobile ? 82 : 90;
+            const left = Math.random() * (maxLeft - minLeft) + minLeft;
+
+            // Slower, smooth float duration (6.0s to 7.5s on mobile)
+            const duration = isMobile 
+                ? Math.random() * 1.5 + 6.0 
+                : Math.random() * 1.8 + 5.5;
+
+            // Gentle sway parameters
+            const swayDistance = isMobile ? Math.floor(Math.random() * 6) + 6 : Math.floor(Math.random() * 10) + 8;
+            const swayRot = isMobile ? Math.floor(Math.random() * 3) + 3 : Math.floor(Math.random() * 4) + 4;
+            const swayDuration = Math.random() * 1.0 + 2.2;
+
+            wrapper.style.left = `${left}vw`;
+            wrapper.style.setProperty('--duration', `${duration.toFixed(2)}s`);
 
             b.style.width = `${size}px`;
             b.style.height = `${Math.floor(size * 1.25)}px`;
-            b.style.left = `${left}vw`;
             b.style.background = color.bg;
             b.style.setProperty('--glow-color', color.glow);
-            b.style.setProperty('--duration', `${duration}s`);
-            b.style.setProperty('--sway-deg', `${sway}deg`);
-            b.style.setProperty('--sway-deg-rev', `-${sway}deg`);
+            b.style.setProperty('--sway-duration', `${swayDuration.toFixed(2)}s`);
+            b.style.setProperty('--sway-left', `-${swayDistance}px`);
+            b.style.setProperty('--sway-right', `${swayDistance}px`);
+            b.style.setProperty('--rot-left', `-${swayRot}deg`);
+            b.style.setProperty('--rot-right', `${swayRot}deg`);
 
             // Inner shine highlight
             const shine = document.createElement('div');
@@ -510,14 +703,23 @@ function triggerBalloonStorm() {
             knot.className = 'balloon-knot';
             b.appendChild(knot);
 
-            // Interactive Pop on Click
-            b.addEventListener('click', (e) => {
-                e.stopPropagation();
+            wrapper.appendChild(b);
+
+            // Pop interaction: fades out immediately without touching transform (no downward teleport!)
+            let isPopped = false;
+            const popBalloon = (e) => {
+                if (e) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                }
+                if (isPopped) return;
+                isPopped = true;
+
                 playPopSound();
                 if (typeof confetti === 'function') {
                     const rect = b.getBoundingClientRect();
                     confetti({
-                        particleCount: 18,
+                        particleCount: isMobile ? 10 : 16,
                         origin: {
                             x: (rect.left + rect.width / 2) / window.innerWidth,
                             y: (rect.top + rect.height / 2) / window.innerHeight
@@ -525,19 +727,31 @@ function triggerBalloonStorm() {
                         colors: ['#ff0040', '#ffd166', '#ffffff', '#ff00aa', '#00e5ff']
                     });
                 }
-                b.style.transform = 'scale(1.4)';
-                b.style.opacity = '0';
-                setTimeout(() => b.remove(), 200);
+
+                wrapper.style.pointerEvents = 'none';
+                wrapper.style.opacity = '0';
+                wrapper.style.transition = 'opacity 0.15s ease';
+                setTimeout(() => {
+                    if (wrapper.parentElement) wrapper.remove();
+                }, 160);
+            };
+
+            wrapper.addEventListener('pointerdown', popBalloon, { passive: false });
+            wrapper.addEventListener('click', popBalloon);
+
+            // Automatically clean up when the balloon finishes floating off the top
+            wrapper.addEventListener('animationend', () => {
+                if (wrapper.parentElement) wrapper.remove();
             });
 
-            container.appendChild(b);
-
-            // Remove after finished floating
+            // Backup timer cleanup
             setTimeout(() => {
-                if (b.parentElement) b.remove();
-            }, duration * 1000 + 500);
+                if (wrapper.parentElement) wrapper.remove();
+            }, (duration + 1) * 1000);
 
-        }, i * 140);
+            container.appendChild(wrapper);
+
+        }, i * staggerInterval);
     }
 }
 
@@ -860,11 +1074,54 @@ function initTimeline() {
 }
 
 // --------------------------------------------------------------------------
-// 8. PART B: "WORDS FOR ME" EMAIL DISPATCH FORM
+// 8. PART B: "WORDS FOR ME" PERSONAL EMAIL DISPATCH FORM
 // --------------------------------------------------------------------------
 function initReplyForm() {
     const form = document.getElementById('reply-form');
     if (!form) return;
+
+    // Recipient Selector (Dinesh, Kireeti, Bhargavi)
+    const recipientChips = document.querySelectorAll('.recipient-chip');
+    const recipientInput = document.getElementById('selected-recipient-input');
+    const replyTitleTarget = document.getElementById('reply-title-target');
+    const targetMemName = document.getElementById('target-recipient-mem-name');
+    const targetMsgName = document.getElementById('target-recipient-msg-name');
+    const btnSubmitText = document.getElementById('btn-submit-text');
+    const favMemoryInput = document.getElementById('input-fav-memory');
+    const messageInput = document.getElementById('input-message');
+
+    function getRecipientData(key) {
+        if (typeof CONFIG !== 'undefined' && CONFIG.recipients && CONFIG.recipients[key]) {
+            return CONFIG.recipients[key];
+        }
+        const capitalized = key.charAt(0).toUpperCase() + key.slice(1);
+        return {
+            name: capitalized,
+            avatar: "✨",
+            email: (typeof CONFIG !== 'undefined' && CONFIG.yourEmail) ? CONFIG.yourEmail : "gdinesh1616@gmail.com",
+            formspreeEndpoint: ""
+        };
+    }
+
+    function updateRecipientUI(key) {
+        const rec = getRecipientData(key);
+        if (replyTitleTarget) replyTitleTarget.textContent = rec.name;
+        if (targetMemName) targetMemName.textContent = rec.name;
+        if (targetMsgName) targetMsgName.textContent = rec.name;
+        if (btnSubmitText) btnSubmitText.textContent = `Send This Note To ${rec.name}`;
+        if (favMemoryInput) favMemoryInput.placeholder = `e.g. That time when ${rec.name} and I...`;
+        if (messageInput) messageInput.placeholder = `Write anything from the heart for ${rec.name}...`;
+    }
+
+    recipientChips.forEach(chip => {
+        chip.addEventListener('click', () => {
+            recipientChips.forEach(c => c.classList.remove('active'));
+            chip.classList.add('active');
+            const key = chip.getAttribute('data-recipient') || 'dinesh';
+            if (recipientInput) recipientInput.value = key;
+            updateRecipientUI(key);
+        });
+    });
 
     // Mood Selector
     const moodBtns = document.querySelectorAll('.mood-btn');
@@ -878,37 +1135,37 @@ function initReplyForm() {
         });
     });
 
-    // Form Submission
+    // Form Submission & Multi-Recipient Delivery
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
 
         const submitBtn = document.getElementById('btn-submit-note');
-        const submitText = document.getElementById('btn-submit-text');
         const spinner = document.getElementById('submit-spinner');
         const feedbackBox = document.getElementById('form-feedback-box');
         const feedbackHead = document.getElementById('form-feedback-head');
         const feedbackDesc = document.getElementById('form-feedback-desc');
 
-        const favMemory = document.getElementById('input-fav-memory').value.trim();
-        const message = document.getElementById('input-message').value.trim();
+        const recipientKey = recipientInput ? recipientInput.value : 'dinesh';
+        const rec = getRecipientData(recipientKey);
+        const favMemory = favMemoryInput ? favMemoryInput.value.trim() : '';
+        const message = messageInput ? messageInput.value.trim() : '';
         const mood = moodInput ? moodInput.value : '🥰 Loved';
 
         if (!message || !favMemory) {
-            alert('Please fill in both the memory and message fields!');
+            alert(`Please share a memory and message for ${rec.name}!`);
             return;
         }
 
         // Loading State
         submitBtn.disabled = true;
         if (spinner) spinner.classList.remove('hidden');
-        if (submitText) submitText.textContent = "Sending your note...";
+        if (btnSubmitText) btnSubmitText.textContent = `Sending to ${rec.name}...`;
 
-        const endpoint = (typeof CONFIG !== 'undefined' && CONFIG.formspreeEndpoint && CONFIG.formspreeEndpoint.trim() !== '')
-            ? CONFIG.formspreeEndpoint.trim()
-            : null;
+        const hasFormspree = rec.formspreeEndpoint && rec.formspreeEndpoint.trim() !== '';
+        const endpoint = hasFormspree ? rec.formspreeEndpoint.trim() : null;
 
         if (endpoint) {
-            // Send via Formspree API
+            // Direct submission via personal Formspree endpoint
             try {
                 const response = await fetch(endpoint, {
                     method: 'POST',
@@ -917,66 +1174,119 @@ function initReplyForm() {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
+                        recipient: rec.name,
                         mood: mood,
                         favorite_memory: favMemory,
                         message: message,
-                        sent_from: 'Birthday Wishes Website',
-                        recipient: (typeof CONFIG !== 'undefined' && CONFIG.senderName) ? CONFIG.senderName : 'Dinesh'
+                        sent_from: 'Birthday Wishes Website'
                     })
                 });
 
                 if (response.ok) {
-                    showSuccessState();
+                    showSuccessState(rec);
                 } else {
-                    handleEmailFallback(mood, favMemory, message);
+                    await tryFormSubmitOrFallback(rec, mood, favMemory, message);
                 }
             } catch (err) {
-                console.error("Formspree submission error:", err);
-                handleEmailFallback(mood, favMemory, message);
+                console.error("Formspree error:", err);
+                await tryFormSubmitOrFallback(rec, mood, favMemory, message);
             }
         } else {
-            // Direct email / mailto fallback when endpoint is not configured yet
-            handleEmailFallback(mood, favMemory, message);
+            // Direct inbox forwarding via FormSubmit.co API or fallback
+            await tryFormSubmitOrFallback(rec, mood, favMemory, message);
         }
 
-        function showSuccessState() {
+        async function tryFormSubmitOrFallback(recipient, m, mem, msg) {
+            const email = (recipient.email && recipient.email.trim() !== '') ? recipient.email.trim() : 'gdinesh1616@gmail.com';
+            const isPlaceholder = email.includes('YOUR_EMAIL_HERE') || email.includes('_email@gmail.com') || email.includes('example.com');
+
+            if (!isPlaceholder) {
+                try {
+                    const response = await fetch(`https://formsubmit.co/ajax/${encodeURIComponent(email)}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            _subject: `💌 Birthday Note for ${recipient.name} (${m})`,
+                            recipient: recipient.name,
+                            mood: m,
+                            favorite_memory: mem,
+                            message: msg
+                        })
+                    });
+
+                    if (response.ok) {
+                        showSuccessState(recipient);
+                        return;
+                    }
+                } catch (err) {
+                    console.warn("FormSubmit fetch issue, using email client fallback", err);
+                }
+            }
+
+            // Direct mailto client fallback targeted specifically to that recipient
+            handleEmailFallback(recipient, m, mem, msg);
+        }
+
+        function showSuccessState(recipient, isMailto = false) {
             if (spinner) spinner.classList.add('hidden');
             form.classList.add('hidden');
             if (feedbackBox) {
                 feedbackBox.classList.remove('hidden');
-                feedbackHead.textContent = "Your Note Has Been Sent! ❤️";
-                feedbackDesc.textContent = `Your heartfelt message and memory have been dispatched directly to ${CONFIG.senderName || 'Dinesh'}'s email.`;
+                feedbackHead.textContent = `Note for ${recipient.name} Sent! ❤️`;
+                feedbackDesc.textContent = isMailto
+                    ? `Your personal message for ${recipient.name} (${recipient.email}) has been prepared! Your email client was opened and the text was copied to your clipboard.`
+                    : `Your heartfelt message and memory have been dispatched directly to ${recipient.name}'s personal inbox (${recipient.email})!`;
             }
             triggerBigConfetti();
-            showToast("💌 Note dispatched successfully! ✨");
+            showToast(`💌 Note sent to ${recipient.name}! ✨`);
         }
 
-        function handleEmailFallback(m, mem, msg) {
+        function handleEmailFallback(recipient, m, mem, msg) {
             if (spinner) spinner.classList.add('hidden');
             submitBtn.disabled = false;
-            if (submitText) submitText.textContent = "Send This Note To Dinesh";
+            if (btnSubmitText) btnSubmitText.textContent = `Send This Note To ${recipient.name}`;
 
-            // Prepare email link
-            const targetEmail = (typeof CONFIG !== 'undefined' && CONFIG.yourEmail) ? CONFIG.yourEmail : 'dinesh@example.com';
-            const subject = encodeURIComponent(`Birthday Note for ${CONFIG.senderName || 'Dinesh'} (${m})`);
-            const body = encodeURIComponent(`Hey ${CONFIG.senderName || 'Dinesh'},\n\nHere is my birthday note for you:\n\nMy Mood: ${m}\n\nA Memory I'll Never Forget:\n${mem}\n\nMy Message For You:\n${msg}\n\nWith love ❤️`);
+            const targetEmail = recipient.email || 'gdinesh1616@gmail.com';
+            const subject = encodeURIComponent(`Birthday Note for ${recipient.name} (${m})`);
+            const body = encodeURIComponent(`Hey ${recipient.name}!\n\nHere is my birthday note for you:\n\nMy Mood: ${m}\n\nA Memory With You I'll Never Forget:\n${mem}\n\nMy Message For You:\n${msg}\n\nWith lots of love ❤️`);
             const mailtoUrl = `mailto:${targetEmail}?subject=${subject}&body=${body}`;
 
-            // Copy to clipboard for convenience
             if (navigator.clipboard) {
-                navigator.clipboard.writeText(`Mood: ${m}\nMemory: ${mem}\nMessage: ${msg}`);
+                navigator.clipboard.writeText(`Note for ${recipient.name}\nMood: ${m}\nMemory: ${mem}\nMessage: ${msg}`);
             }
 
-            // Open user's email client
             window.open(mailtoUrl, '_blank');
-
-            // Show confirmation
-            showSuccessState();
-            if (feedbackDesc) {
-                feedbackDesc.textContent = `Note prepared! Your email app has been opened to send this directly to ${targetEmail} (and also copied to your clipboard!).`;
-            }
+            showSuccessState(recipient, true);
         }
     });
+
+    // "Send a Note to Another Friend" Reset Action
+    const btnWriteAnother = document.getElementById('btn-write-another');
+    if (btnWriteAnother) {
+        btnWriteAnother.addEventListener('click', () => {
+            if (favMemoryInput) favMemoryInput.value = '';
+            if (messageInput) messageInput.value = '';
+
+            const submitBtn = document.getElementById('btn-submit-note');
+            const spinner = document.getElementById('submit-spinner');
+            const feedbackBox = document.getElementById('form-feedback-box');
+
+            if (spinner) spinner.classList.add('hidden');
+            if (submitBtn) submitBtn.disabled = false;
+
+            const currentKey = recipientInput ? recipientInput.value : 'dinesh';
+            const rec = getRecipientData(currentKey);
+            if (btnSubmitText) btnSubmitText.textContent = `Send This Note To ${rec.name}`;
+
+            if (feedbackBox) feedbackBox.classList.add('hidden');
+            form.classList.remove('hidden');
+
+            form.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        });
+    }
 }
 
 // --------------------------------------------------------------------------
