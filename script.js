@@ -13,7 +13,7 @@ function initApp() {
     initAudioEngine();
     initCakeExperience();
     initLetterExperience();
-    initQuizEngine();
+    initSpinWheel();
     initTimeline();
     initReplyForm();
     initScrollSpy();
@@ -25,7 +25,7 @@ function initApp() {
 const unlockedSections = {
     cake: true,
     letter: false,
-    quiz: false,
+    wheel: false,
     memories: false
 };
 
@@ -333,6 +333,24 @@ function playTypewriterTick() {
         gain.connect(audioCtx.destination);
         osc.start();
         osc.stop(audioCtx.currentTime + 0.04);
+    } catch (e) {}
+}
+
+// Sound FX: Mechanical Wheel Tick
+function playWheelTickSound() {
+    if (!audioCtx) getAudioContext();
+    if (!audioCtx) return;
+    try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(750 + Math.random() * 200, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.025);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.03);
     } catch (e) {}
 }
 
@@ -886,13 +904,13 @@ function finishLetterTypewriting(wasSkipped = false) {
         letterBody.innerHTML = paragraphs.map(p => `<p>${escapeHTML(p)}</p>`).join('');
     }
 
-    // Reveal closing, polaroids, and quiz CTA
+    // Reveal closing, polaroids, and memories CTA
     if (letterClosing) letterClosing.classList.remove('hidden');
     if (letterPolaroids) letterPolaroids.classList.remove('hidden');
     if (letterCta) letterCta.classList.remove('hidden');
 
-    // Unlock Section 3: Quiz!
-    unlockSection('quiz');
+    // Unlock Section 3: Birthday Fun Wheel!
+    unlockSection('wheel');
 
     // Celebration
     if (typeof confetti === 'function') {
@@ -904,113 +922,268 @@ function finishLetterTypewriting(wasSkipped = false) {
         });
     }
 
-    showToast(wasSkipped ? "⚡ Full letter revealed! Chapter III Quiz unlocked! 🏆" : "✨ Letter finished! Chapter III Quiz unlocked! 🏆");
+    showToast(wasSkipped ? "⚡ Full letter revealed! Chapter III Fun Wheel unlocked! 🎡" : "✨ Letter finished! Chapter III Fun Wheel unlocked! 🎡");
 }
 
 // --------------------------------------------------------------------------
-// 6. SECTION 3: FRIENDSHIP TRIVIA & QUESTIONS
+// 6. SECTION 3: BIRTHDAY FUN WHEEL OF SURPRISES
 // --------------------------------------------------------------------------
-let currentQuestionIndex = 0;
-let userScore = 0;
+function initSpinWheel() {
+    const canvas = document.getElementById('wheel-canvas');
+    const spinBtn = document.getElementById('btn-spin-wheel');
+    const spinAgainBtn = document.getElementById('btn-spin-again');
+    const pointer = document.getElementById('wheel-pointer');
+    const resultCard = document.getElementById('wheel-result-card');
+    const badgeRibbon = document.getElementById('result-badge-ribbon');
+    const prizeIcon = document.getElementById('result-prize-icon');
+    const prizeTitle = document.getElementById('result-prize-title');
+    const prizeDesc = document.getElementById('result-prize-desc');
 
-function initQuizEngine() {
-    if (typeof CONFIG === 'undefined' || !Array.isArray(CONFIG.quiz) || CONFIG.quiz.length === 0) return;
+    if (!canvas || !spinBtn) return;
 
-    renderQuizQuestion(0);
+    const ctx = canvas.getContext('2d');
+    const options = (typeof CONFIG !== 'undefined' && Array.isArray(CONFIG.wheelOptions) && CONFIG.wheelOptions.length > 0)
+        ? CONFIG.wheelOptions
+        : [
+            { label: "Treat From Dinesh", icon: "🍕", desc: "Dinesh treats you to food!" },
+            { label: "Dare For Kireeti", icon: "😈", desc: "Kireeti does a dare!" },
+            { label: "Coffee From Bhargavi", icon: "☕", desc: "Bhargavi treats you to coffee!" },
+            { label: "Queen For A Day", icon: "👑", desc: "Your plan rules the day!" },
+            { label: "Trio Birthday Song", icon: "🎤", desc: "A song sung for you!" },
+            { label: "Secret Trio Wish", icon: "✨", desc: "One wish granted!" }
+        ];
 
-    const nextBtn = document.getElementById('quiz-next-btn');
-    if (nextBtn) {
-        nextBtn.addEventListener('click', () => {
-            currentQuestionIndex++;
-            if (currentQuestionIndex < CONFIG.quiz.length) {
-                renderQuizQuestion(currentQuestionIndex);
-            } else {
-                showQuizResults();
+    const numSlices = options.length;
+    const sliceAngle = (2 * Math.PI) / numSlices;
+    let currentRotation = 0;
+    let isSpinning = false;
+    let lastTickIndex = -1;
+
+    // Palette of vibrant, glowing slices
+    const slicePalettes = [
+        { bg: '#d90429', text: '#ffffff' }, // Ruby Crimson
+        { bg: '#230316', text: '#ffd700' }, // Dark Velvet
+        { bg: '#ef233c', text: '#ffffff' }, // Bright Coral Crimson
+        { bg: '#1c0312', text: '#ff70a6' }, // Deep Rose Midnight
+        { bg: '#800f2f', text: '#ffffff' }, // Wine Berry
+        { bg: '#2b061c', text: '#ffd166' }  // Dark Gold Accent
+    ];
+
+    // Canvas size
+    const size = 500;
+    canvas.width = size;
+    canvas.height = size;
+    const center = size / 2;
+    const radius = center - 15;
+
+    function drawWheel(rotation = 0) {
+        ctx.clearRect(0, 0, size, size);
+
+        ctx.save();
+        ctx.translate(center, center);
+        ctx.rotate(rotation);
+
+        for (let i = 0; i < numSlices; i++) {
+            const startAngle = i * sliceAngle;
+            const endAngle = startAngle + sliceAngle;
+            const pal = slicePalettes[i % slicePalettes.length];
+
+            // Slice arc
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.arc(0, 0, radius, startAngle, endAngle);
+            ctx.closePath();
+            ctx.fillStyle = pal.bg;
+            ctx.fill();
+
+            // Slice boundary stroke
+            ctx.strokeStyle = 'rgba(255, 215, 0, 0.45)';
+            ctx.lineWidth = 2.5;
+            ctx.stroke();
+
+            // Label & Icon
+            ctx.save();
+            const textAngle = startAngle + sliceAngle / 2;
+            ctx.rotate(textAngle);
+            ctx.textAlign = 'right';
+            ctx.textBaseline = 'middle';
+
+            // Draw Icon
+            ctx.font = '24px "Apple Color Emoji", "Segoe UI Emoji", sans-serif';
+            ctx.fillText(options[i].icon || '🎁', radius - 30, -10);
+
+            // Draw Label text
+            ctx.fillStyle = pal.text;
+            ctx.font = 'bold 13px "Outfit", "Segoe UI", sans-serif';
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
+            ctx.shadowBlur = 4;
+            ctx.fillText(options[i].label, radius - 30, 15);
+            ctx.restore();
+        }
+
+        // Outer decorative ring
+        ctx.beginPath();
+        ctx.arc(0, 0, radius + 2, 0, 2 * Math.PI);
+        ctx.strokeStyle = '#ffd700';
+        ctx.lineWidth = 5;
+        ctx.shadowColor = '#ff0040';
+        ctx.shadowBlur = 15;
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+
+        // Decorative bulbs / dots around edge
+        const numDots = numSlices * 4;
+        for (let d = 0; d < numDots; d++) {
+            const dotAngle = (d / numDots) * 2 * Math.PI;
+            const dx = Math.cos(dotAngle) * (radius - 4);
+            const dy = Math.sin(dotAngle) * (radius - 4);
+            ctx.beginPath();
+            ctx.arc(dx, dy, 3, 0, 2 * Math.PI);
+            ctx.fillStyle = d % 2 === 0 ? '#ffd700' : '#ffffff';
+            ctx.fill();
+        }
+
+        ctx.restore();
+    }
+
+    drawWheel(0);
+
+    // Support clean testing reset via URL parameter (e.g. index.html?reset=1)
+    if (window.location && window.location.search && window.location.search.includes('reset')) {
+        try {
+            localStorage.removeItem('birthday_wheel_first_outcome');
+        } catch (e) {}
+    }
+
+    function spin() {
+        if (isSpinning) return;
+        isSpinning = true;
+        spinBtn.disabled = true;
+
+        if (resultCard) resultCard.classList.add('hidden');
+
+        // Pick random winning index
+        const winningIndex = Math.floor(Math.random() * numSlices);
+        const winner = options[winningIndex];
+
+        // Pointer is at the TOP (angle = 3*PI/2)
+        const randomRevolutions = (6 + Math.random() * 3) * (2 * Math.PI);
+        const currentNormalized = currentRotation % (2 * Math.PI);
+        const sliceCenter = winningIndex * sliceAngle + (sliceAngle * (0.3 + Math.random() * 0.4));
+        const targetNormalized = (3 * Math.PI / 2 - sliceCenter + 4 * Math.PI) % (2 * Math.PI);
+        let angleDelta = targetNormalized - currentNormalized;
+        if (angleDelta < 0) angleDelta += 2 * Math.PI;
+
+        const totalAngleToSpin = randomRevolutions + angleDelta;
+        const startRotation = currentRotation;
+
+        const duration = 5200; // 5.2 seconds
+        const startTime = performance.now();
+
+        function animate(now) {
+            const elapsed = now - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+
+            // Quintic Ease-Out curve for dramatic slow-down
+            const easeOut = 1 - Math.pow(1 - progress, 4.5);
+            currentRotation = startRotation + totalAngleToSpin * easeOut;
+
+            // Tick sound & pointer vibration on sector boundary
+            const currentSliceAtTop = Math.floor(
+                ((3 * Math.PI / 2 - (currentRotation % (2 * Math.PI)) + 4 * Math.PI) % (2 * Math.PI)) / sliceAngle
+            );
+
+            if (currentSliceAtTop !== lastTickIndex) {
+                lastTickIndex = currentSliceAtTop;
+                playWheelTickSound();
+                if (pointer) {
+                    pointer.classList.add('tick');
+                    setTimeout(() => pointer.classList.remove('tick'), 60);
+                }
             }
-        });
-    }
-}
 
-function renderQuizQuestion(index) {
-    const qData = CONFIG.quiz[index];
-    const totalQ = CONFIG.quiz.length;
+            drawWheel(currentRotation);
 
-    const counter = document.getElementById('quiz-counter');
-    const progressBar = document.getElementById('quiz-progress-bar');
-    const questionTitle = document.getElementById('quiz-question-title');
-    const optionsContainer = document.getElementById('quiz-options-container');
-    const feedbackBox = document.getElementById('quiz-feedback-box');
-    const actionContainer = document.getElementById('quiz-action-container');
+            if (progress < 1) {
+                requestAnimationFrame(animate);
+            } else {
+                finishSpin(winner);
+            }
+        }
 
-    if (!qData) return;
-
-    if (counter) counter.textContent = `Question ${index + 1} of ${totalQ}`;
-    if (progressBar) progressBar.style.width = `${((index + 1) / totalQ) * 100}%`;
-    if (questionTitle) questionTitle.textContent = qData.question;
-
-    if (feedbackBox) feedbackBox.classList.add('hidden');
-    if (actionContainer) actionContainer.classList.add('hidden');
-
-    if (optionsContainer) {
-        optionsContainer.innerHTML = '';
-        qData.options.forEach((optText, optIdx) => {
-            const btn = document.createElement('button');
-            btn.className = 'quiz-option-btn';
-            btn.innerHTML = `<span>${escapeHTML(optText)}</span> <span class="opt-badge">✨</span>`;
-            
-            btn.addEventListener('click', () => {
-                handleQuizSelection(optIdx, qData, btn);
-            });
-            optionsContainer.appendChild(btn);
-        });
-    }
-}
-
-function handleQuizSelection(selectedIdx, qData, clickedBtn) {
-    const allOptionBtns = document.querySelectorAll('.quiz-option-btn');
-    allOptionBtns.forEach(btn => btn.disabled = true);
-
-    const feedbackBox = document.getElementById('quiz-feedback-box');
-    const feedbackText = document.getElementById('feedback-text');
-    const actionContainer = document.getElementById('quiz-action-container');
-
-    clickedBtn.classList.add('selected-correct');
-    userScore++;
-    playSliceChime();
-
-    if (typeof confetti === 'function') {
-        confetti({
-            particleCount: 20,
-            spread: 50,
-            origin: { y: 0.6 },
-            colors: ['#ff0040', '#00ff73', '#ffd166']
-        });
+        requestAnimationFrame(animate);
     }
 
-    if (feedbackBox && feedbackText) {
-        feedbackText.textContent = qData.feedback || "Awesome choice! ✨";
-        feedbackBox.classList.remove('hidden');
-    }
+    function finishSpin(winner) {
+        isSpinning = false;
+        spinBtn.disabled = false;
 
-    if (actionContainer) {
-        actionContainer.classList.remove('hidden');
-    }
-}
-
-function showQuizResults() {
-    const quizCard = document.getElementById('quiz-card');
-    const resultsCard = document.getElementById('quiz-results-card');
-
-    if (quizCard) quizCard.classList.add('hidden');
-    if (resultsCard) {
-        resultsCard.classList.remove('hidden');
+        playSliceChime();
         triggerBigConfetti();
-        
-        // Unlock Section 4 (Timeline of Memories & Words for Me)
+
+        // Check if this was her 1st spin
+        const existingRecord = localStorage.getItem('birthday_wheel_first_outcome');
+        const isFirstSpin = !existingRecord;
+
+        if (isFirstSpin) {
+            const firstOutcomeRecord = {
+                prize: winner.label,
+                desc: winner.desc,
+                icon: winner.icon,
+                timestamp: new Date().toLocaleString()
+            };
+            try {
+                localStorage.setItem('birthday_wheel_first_outcome', JSON.stringify(firstOutcomeRecord));
+            } catch (e) {}
+
+            // Silent dispatch directly to Dinesh's email inbox via Formspree!
+            const endpoint = (typeof CONFIG !== 'undefined' && CONFIG.recipients && CONFIG.recipients.dinesh && CONFIG.recipients.dinesh.formspreeEndpoint)
+                ? CONFIG.recipients.dinesh.formspreeEndpoint
+                : ((typeof CONFIG !== 'undefined' && CONFIG.formspreeEndpoint) ? CONFIG.formspreeEndpoint : null);
+
+            if (endpoint) {
+                fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        event: "🎡 Fun Wheel Official 1st Spin Outcome",
+                        birthday_girl: (typeof CONFIG !== 'undefined' && CONFIG.friendName) ? CONFIG.friendName : "Nandhitha",
+                        prize_won: winner.label,
+                        description: winner.desc,
+                        timestamp: new Date().toLocaleString()
+                    })
+                }).catch(err => console.log('First spin outcome sync dispatch error:', err));
+            }
+
+            if (badgeRibbon) badgeRibbon.textContent = "✨ OFFICIAL 1ST SPIN RECORD ✨";
+            showToast(`🎉 You won: ${winner.label}! First outcome locked! ✨`);
+        } else {
+            let originalPrize = winner.label;
+            try {
+                const parsed = JSON.parse(existingRecord);
+                originalPrize = parsed.prize || winner.label;
+            } catch (e) {}
+            if (badgeRibbon) badgeRibbon.textContent = `🎉 FUN SPIN RESULT (Official 1st: ${originalPrize})`;
+            showToast(`🎡 Fun Spin landed on: ${winner.label}!`);
+        }
+
+        // Update result card
+        if (prizeIcon) prizeIcon.textContent = winner.icon || "🎉";
+        if (prizeTitle) prizeTitle.textContent = winner.label;
+        if (prizeDesc) prizeDesc.textContent = winner.desc;
+
+        if (resultCard) {
+            resultCard.classList.remove('hidden');
+            resultCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        // Unlock Chapter IV (Memories)
         unlockSection('memories');
-        
-        resultsCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        showToast("🏆 All questions complete! Chapter IV Memories unlocked! ✨");
+    }
+
+    spinBtn.addEventListener('click', spin);
+    if (spinAgainBtn) {
+        spinAgainBtn.addEventListener('click', spin);
     }
 }
 
@@ -1161,6 +1334,14 @@ function initReplyForm() {
         if (spinner) spinner.classList.remove('hidden');
         if (btnSubmitText) btnSubmitText.textContent = `Sending to ${rec.name}...`;
 
+        const savedWheel = localStorage.getItem('birthday_wheel_first_outcome');
+        let wheelPrizeWon = "Not Spun";
+        if (savedWheel) {
+            try {
+                wheelPrizeWon = JSON.parse(savedWheel).prize || "Not Spun";
+            } catch (e) {}
+        }
+
         const hasFormspree = rec.formspreeEndpoint && rec.formspreeEndpoint.trim() !== '';
         const endpoint = hasFormspree ? rec.formspreeEndpoint.trim() : null;
 
@@ -1178,6 +1359,7 @@ function initReplyForm() {
                         mood: mood,
                         favorite_memory: favMemory,
                         message: message,
+                        wheel_prize_won: wheelPrizeWon,
                         sent_from: 'Birthday Wishes Website'
                     })
                 });
@@ -1213,7 +1395,8 @@ function initReplyForm() {
                             recipient: recipient.name,
                             mood: m,
                             favorite_memory: mem,
-                            message: msg
+                            message: msg,
+                            wheel_prize: wheelPrizeWon
                         })
                     });
 

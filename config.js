@@ -34,7 +34,7 @@ const CONFIG = {
         bhargavi: {
             name: "Bhargavi",
             avatar: "🌸",
-            email: "bhargavi_email@gmail.com", // <-- REPLACE with Bhargavi's actual email
+            email: "bagireddy2008@gmail.com", // <-- REPLACE with Bhargavi's actual email
             formspreeEndpoint: "" // Optional: paste Bhargavi's Formspree endpoint if created
         }
     },
@@ -64,53 +64,17 @@ const CONFIG = {
     },
 
     // ------------------------------------------
-    // 5. Friendship Quiz / Questions (Section 3)
+    // 5. Birthday Fun Wheel of Surprises (Section 3)
     // ------------------------------------------
-    quiz: [
-        {
-            question: "What is your official superpower in our friendship?",
-            options: [
-                "Making me laugh until my stomach hurts",
-                "Giving the best advice at just the right time",
-                "Being the most photogenic person ever",
-                "All of the above (and looking gorgeous while doing it!)"
-            ],
-            correctIndex: 3,
-            feedback: "100% correct! You truly have all the superpowers! ✨"
-        },
-        {
-            question: "If we had an all-expenses-paid trip tomorrow, where are we heading?",
-            options: [
-                "A quiet cozy mountain cabin under the stars",
-                "A tropical beach with iced drinks & sunsets",
-                "An amusement park screaming on rollercoasters",
-                "A road trip singing our hearts out to good music"
-            ],
-            correctIndex: 3,
-            feedback: "Pack your bags, that adventure is definitely on our bucket list! 🚗✨"
-        },
-        {
-            question: "Who is officially the more dramatic one between us?",
-            options: [
-                "Definitely you",
-                "Definitely me (Dinesh)",
-                "It's a very tight 50/50 competition",
-                "Neither, we are pure angels 😇"
-            ],
-            correctIndex: 2,
-            feedback: "Haha, let's be honest, it's definitely a tight competition! 😂"
-        },
-        {
-            question: "How awesome is today going to be?",
-            options: [
-                "Great",
-                "Unforgettable",
-                "Legendary",
-                "Beyond magical because it's YOUR birthday!"
-            ],
-            correctIndex: 3,
-            feedback: "Bingo! Today is all about you! Enjoy every single second! 💖"
-        }
+    // You can edit, add, or customize any of the options below!
+    // The very first outcome she gets will be sent to your email automatically.
+    wheelOptions: [
+        { label: "Treat From Dinesh", icon: "🍕", desc: "Dinesh will treat you to your favorite meal or snacks!" },
+        { label: "Dare For Kireeti", icon: "😈", desc: "Kireeti has to do any 1 funny dare you give him!" },
+        { label: "Coffee From Bhargavi", icon: "☕", desc: "Bhargavi treats you to coffee and your favorite dessert!" },
+        { label: "Queen For A Day", icon: "👑", desc: "All 3 of us must follow your hangout plan with zero complaints!" },
+        { label: "Movie+Biryani treat from kireeti", icon: "🎤", desc: "Dinesh, Kireeti & Bhargavi will sing you a birthday song on call!" },
+        { label: "Secret Trio Wish", icon: "✨", desc: "One custom wish granted by all three of us together!" }
     ],
 
     // ------------------------------------------
