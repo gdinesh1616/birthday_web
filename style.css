@@ -1104,6 +1104,178 @@ body {
     font-weight: 400;
 }
 
+/* Cipher & Decryption Console in Letter Parchment */
+.cipher-status-banner {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 0, 64, 0.12);
+    border: 1px solid rgba(255, 0, 64, 0.45);
+    color: #ff6b8b;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.76rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 22px;
+    box-shadow: 0 0 15px rgba(255, 0, 64, 0.2);
+    transition: all 0.4s ease;
+}
+
+.cipher-status-banner.decrypted {
+    background: rgba(46, 213, 115, 0.15);
+    border-color: #2ed573;
+    color: #2ed573;
+    box-shadow: 0 0 20px rgba(46, 213, 115, 0.4);
+}
+
+.cipher-status-banner .cipher-icon {
+    font-size: 0.95rem;
+}
+
+.cipher-badge-text {
+    letter-spacing: 1.5px;
+}
+
+.letter-body.cipher-scrambled p,
+.cipher-scrambled {
+    font-family: 'Courier New', Courier, monospace !important;
+    letter-spacing: 1.8px !important;
+    color: #ff85a1 !important;
+    text-shadow: 0 0 10px rgba(255, 0, 64, 0.45);
+    word-break: break-all;
+    line-height: 1.8;
+}
+
+.cipher-decoder-box {
+    margin-top: 30px;
+    padding: 22px 24px;
+    background: rgba(14, 1, 8, 0.85);
+    border: 1.5px dashed var(--neon-red);
+    border-radius: 14px;
+    box-shadow: 0 0 25px rgba(255, 0, 64, 0.22);
+    transition: all 0.35s ease;
+}
+
+.cipher-decoder-box.solved {
+    border-style: solid;
+    border-color: #2ed573;
+    background: rgba(8, 24, 14, 0.8);
+    box-shadow: 0 0 25px rgba(46, 213, 115, 0.3);
+}
+
+.decoder-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.decoder-header .decoder-icon {
+    font-size: 1.4rem;
+    filter: drop-shadow(0 0 8px #ffd166);
+}
+
+.decoder-hint {
+    margin: 0;
+    font-size: 0.95rem;
+    color: #e5e5e5;
+    line-height: 1.5;
+}
+
+.neon-text-gold {
+    color: #ffd166;
+    text-shadow: 0 0 10px rgba(255, 209, 102, 0.65);
+    font-weight: 700;
+}
+
+.decoder-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.decoder-input-group {
+    display: flex;
+    gap: 12px;
+    width: 100%;
+}
+
+.cipher-input {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1.5px solid rgba(255, 0, 64, 0.45);
+    border-radius: 10px;
+    padding: 12px 18px;
+    color: #ffffff;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.95rem;
+    outline: none;
+    transition: var(--transition);
+}
+
+.cipher-input:focus {
+    border-color: var(--neon-red);
+    box-shadow: 0 0 16px rgba(255, 0, 64, 0.55);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.cipher-input::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+    font-style: italic;
+}
+
+.cipher-input:disabled {
+    background: rgba(255, 255, 255, 0.03);
+    border-color: rgba(46, 213, 115, 0.4);
+    color: #2ed573;
+    cursor: not-allowed;
+}
+
+.btn-decrypt {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    white-space: nowrap;
+    padding: 12px 24px;
+    font-size: 0.95rem;
+    cursor: pointer;
+}
+
+.decoder-feedback {
+    font-size: 0.9rem;
+    padding: 10px 14px;
+    border-radius: 8px;
+    animation: fadeIn 0.3s ease;
+}
+
+.decoder-feedback.error {
+    background: rgba(255, 0, 64, 0.15);
+    border: 1px solid var(--neon-red);
+    color: #ff6b8b;
+    box-shadow: 0 0 12px rgba(255, 0, 64, 0.25);
+}
+
+.decoder-feedback.success {
+    background: rgba(46, 213, 115, 0.15);
+    border: 1px solid #2ed573;
+    color: #2ed573;
+    box-shadow: 0 0 12px rgba(46, 213, 115, 0.25);
+}
+
+.shake-error {
+    animation: shakeError 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+@keyframes shakeError {
+    10%, 90% { transform: translate3d(-2px, 0, 0); }
+    20%, 80% { transform: translate3d(4px, 0, 0); }
+    30%, 50%, 70% { transform: translate3d(-6px, 0, 0); }
+    40%, 60% { transform: translate3d(6px, 0, 0); }
+}
+
 .letter-closing {
     margin-top: 35px;
     text-align: right;
@@ -2123,6 +2295,19 @@ body {
         line-height: 1.75;
         text-align: left;
         margin-bottom: 16px;
+    }
+
+    .cipher-decoder-box {
+        padding: 16px;
+        margin-top: 20px;
+    }
+
+    .decoder-input-group {
+        flex-direction: column;
+    }
+
+    .decoder-header {
+        align-items: flex-start;
     }
 
     .letter-closing {

@@ -778,18 +778,27 @@ function triggerBalloonStorm() {
 // --------------------------------------------------------------------------
 let letterTypingTimer = null;
 let isLetterTyping = false;
+let isLetterDecrypted = false;
 
 function initLetterExperience() {
     const envelopeWrapper = document.getElementById('envelope-wrapper');
     const envelopeBox = document.getElementById('envelope-box');
     const openedLetter = document.getElementById('opened-letter');
     const skipBtn = document.getElementById('skip-typing-btn');
+    const decoderForm = document.getElementById('decoder-form');
 
     if (!envelopeWrapper) return;
 
     if (skipBtn) {
         skipBtn.addEventListener('click', () => {
             skipLetterTypewriter();
+        });
+    }
+
+    if (decoderForm) {
+        decoderForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            handlePasskeySubmit();
         });
     }
 
@@ -812,20 +821,38 @@ function initLetterExperience() {
 
 function startLetterTypewriter() {
     if (isLetterTyping) return;
+    if (isLetterDecrypted) {
+        finishDecryptedLetter(true);
+        return;
+    }
     isLetterTyping = true;
 
     const letterSalutation = document.getElementById('letter-salutation');
     const letterBody = document.getElementById('letter-body');
+    const skipBtn = document.getElementById('skip-typing-btn');
+
+    if (skipBtn) {
+        skipBtn.textContent = '⚡ Skip Cipher Typing';
+        skipBtn.classList.remove('hidden');
+    }
 
     const salutationText = (typeof CONFIG !== 'undefined' && CONFIG.letter && CONFIG.letter.salutation) 
         ? CONFIG.letter.salutation 
         : "Dearest,";
-    const paragraphs = (typeof CONFIG !== 'undefined' && CONFIG.letter && Array.isArray(CONFIG.letter.paragraphs)) 
-        ? CONFIG.letter.paragraphs 
-        : [];
+    const cipherParagraphs = (typeof CONFIG !== 'undefined' && CONFIG.letter && Array.isArray(CONFIG.letter.cipherText) && CONFIG.letter.cipherText.length > 0)
+        ? CONFIG.letter.cipherText
+        : [
+            "§∆≈Ω µ∂øπ∑ ¬˚∆¬ øπ¥† ®¡™£ ¢∞§¶ •ªº– ≠±≤≥ µπø ¥†® ¡™£¢ ∞§¶• ªº–≠ ±≤≥µ…",
+            "Xk9# vL@7 mq9!z pw0* r8#x t1&b j4%k z8!q 91&m c5^w b2*k p9$x r3#t 84&v…",
+            "7F8A 9C2E 1B4D 0E3F 5A7B 8C9D 2E4F 3A1B 0C8D 7E9F 4A2B 6C8D 1E3F 5A7B…",
+            "◊◈◆ ◰◱ ◲◳ ▰▱ ◴◵ ◶◷ ◸◹ ◺◻ ◼◽ ◾◬ ◭◮ ◪◫ ◰◱ ◲◳ ▰▱…"
+        ];
 
     if (letterSalutation) letterSalutation.innerHTML = '<span class="typing-cursor">|</span>';
-    if (letterBody) letterBody.innerHTML = '';
+    if (letterBody) {
+        letterBody.classList.add('cipher-scrambled');
+        letterBody.innerHTML = '';
+    }
 
     // First type salutation
     let charIndex = 0;
@@ -836,22 +863,25 @@ function startLetterTypewriter() {
                 letterSalutation.innerHTML = escapeHTML(salutationText.substring(0, charIndex)) + '<span class="typing-cursor">|</span>';
             }
             playTypewriterTick();
-            letterTypingTimer = setTimeout(typeSalutation, 45 + Math.random() * 30);
+            letterTypingTimer = setTimeout(typeSalutation, 40 + Math.random() * 25);
         } else {
             // Salutation done, remove cursor from salutation
             if (letterSalutation) letterSalutation.innerHTML = escapeHTML(salutationText);
-            // Start typing paragraphs
-            typeNextParagraph(0);
+            // Start typing cipher paragraphs
+            typeNextCipherParagraph(0);
         }
     }
 
-    function typeNextParagraph(pIndex) {
-        if (pIndex >= paragraphs.length) {
-            finishLetterTypewriting();
+    function typeNextCipherParagraph(pIndex) {
+        if (pIndex >= cipherParagraphs.length) {
+            isLetterTyping = false;
+            if (skipBtn) skipBtn.classList.add('hidden');
+            const passkeyInput = document.getElementById('cipher-passkey-input');
+            if (passkeyInput) passkeyInput.focus();
             return;
         }
 
-        const pText = paragraphs[pIndex];
+        const pText = cipherParagraphs[pIndex];
         const pElem = document.createElement('p');
         if (letterBody) letterBody.appendChild(pElem);
 
@@ -861,29 +891,184 @@ function startLetterTypewriter() {
                 pCharIdx++;
                 pElem.innerHTML = escapeHTML(pText.substring(0, pCharIdx)) + '<span class="typing-cursor">|</span>';
                 if (pCharIdx % 2 === 0) playTypewriterTick();
-                letterTypingTimer = setTimeout(typeParagraphChar, 20 + Math.random() * 15);
+                letterTypingTimer = setTimeout(typeParagraphChar, 14 + Math.random() * 10);
             } else {
                 pElem.innerHTML = escapeHTML(pText);
-                letterTypingTimer = setTimeout(() => typeNextParagraph(pIndex + 1), 350);
+                letterTypingTimer = setTimeout(() => typeNextCipherParagraph(pIndex + 1), 220);
             }
         }
 
         typeParagraphChar();
     }
 
-    letterTypingTimer = setTimeout(typeSalutation, 400);
+    letterTypingTimer = setTimeout(typeSalutation, 350);
 }
 
 function skipLetterTypewriter() {
     clearTimeout(letterTypingTimer);
-    finishLetterTypewriting(true);
+    if (isLetterDecrypted) {
+        finishDecryptedLetter(true);
+    } else {
+        isLetterTyping = false;
+        const letterSalutation = document.getElementById('letter-salutation');
+        const letterBody = document.getElementById('letter-body');
+        const skipBtn = document.getElementById('skip-typing-btn');
+
+        if (skipBtn) skipBtn.classList.add('hidden');
+
+        const salutationText = (typeof CONFIG !== 'undefined' && CONFIG.letter && CONFIG.letter.salutation) 
+            ? CONFIG.letter.salutation 
+            : "Dearest,";
+        const cipherParagraphs = (typeof CONFIG !== 'undefined' && CONFIG.letter && Array.isArray(CONFIG.letter.cipherText) && CONFIG.letter.cipherText.length > 0)
+            ? CONFIG.letter.cipherText
+            : [
+                "§∆≈Ω µ∂øπ∑ ¬˚∆¬ øπ¥† ®¡™£ ¢∞§¶ •ªº– ≠±≤≥ µπø ¥†® ¡™£¢ ∞§¶• ªº–≠ ±≤≥µ…",
+                "Xk9# vL@7 mq9!z pw0* r8#x t1&b j4%k z8!q 91&m c5^w b2*k p9$x r3#t 84&v…",
+                "7F8A 9C2E 1B4D 0E3F 5A7B 8C9D 2E4F 3A1B 0C8D 7E9F 4A2B 6C8D 1E3F 5A7B…",
+                "◊◈◆ ◰◱ ◲◳ ▰▱ ◴◵ ◶◷ ◸◹ ◺◻ ◼◽ ◾◬ ◭◮ ◪◫ ◰◱ ◲◳ ▰▱…"
+            ];
+
+        if (letterSalutation) letterSalutation.innerHTML = escapeHTML(salutationText);
+        if (letterBody) {
+            letterBody.classList.add('cipher-scrambled');
+            letterBody.innerHTML = cipherParagraphs.map(p => `<p>${escapeHTML(p)}</p>`).join('');
+        }
+        showToast("🔒 Cipher text loaded! Enter the secret passkey from Kireeti to decrypt ⚡");
+    }
 }
 
-function finishLetterTypewriting(wasSkipped = false) {
+function handlePasskeySubmit() {
+    if (isLetterDecrypted) return;
+
+    const passkeyInput = document.getElementById('cipher-passkey-input');
+    const feedbackMsg = document.getElementById('decoder-feedback-msg');
+    const decoderBox = document.getElementById('cipher-decoder-box');
+    const badgeBanner = document.getElementById('cipher-status-banner');
+    const badgeText = document.getElementById('cipher-badge-text');
+
+    if (!passkeyInput) return;
+
+    const userPasskey = passkeyInput.value.trim();
+    const expectedPasskey = ((typeof CONFIG !== 'undefined' && CONFIG.letter && CONFIG.letter.secretCode) 
+        ? CONFIG.letter.secretCode 
+        : 'KIREETI2026').trim();
+
+    if (userPasskey.toUpperCase() === expectedPasskey.toUpperCase()) {
+        // Correct Passkey!
+        isLetterDecrypted = true;
+        clearTimeout(letterTypingTimer);
+        isLetterTyping = false;
+
+        // Feedback
+        if (feedbackMsg) {
+            feedbackMsg.innerHTML = '✨ <strong>Passkey Accepted!</strong> Decrypting secret message...';
+            feedbackMsg.className = 'decoder-feedback success';
+            feedbackMsg.classList.remove('hidden');
+        }
+
+        // Update Decoder box and status badge
+        if (decoderBox) decoderBox.classList.add('solved');
+        passkeyInput.disabled = true;
+        const decryptBtn = document.getElementById('btn-decrypt-letter');
+        if (decryptBtn) {
+            decryptBtn.disabled = true;
+            decryptBtn.innerHTML = '<span>✅ Decrypted</span>';
+        }
+
+        if (badgeBanner) {
+            badgeBanner.classList.add('decrypted');
+            const icon = badgeBanner.querySelector('.cipher-icon');
+            if (icon) icon.textContent = '🔓';
+        }
+        if (badgeText) badgeText.textContent = 'CIPHER DECRYPTED & UNLOCKED';
+
+        // Play chime & confetti
+        playSliceChime();
+        if (typeof confetti === 'function') {
+            confetti({
+                particleCount: 50,
+                spread: 70,
+                origin: { y: 0.6 },
+                colors: ['#2ed573', '#ffd166', '#ff0040']
+            });
+        }
+
+        showToast("🔓 Passkey verified! Decrypting letter...");
+
+        // Start decrypted reveal
+        startDecryptedReveal();
+    } else {
+        // Incorrect Passkey
+        if (feedbackMsg) {
+            feedbackMsg.innerHTML = '❌ <strong>Incorrect Passkey!</strong> Reach out to <strong>Kireeti</strong> for the secret passkey 🔑';
+            feedbackMsg.className = 'decoder-feedback error';
+            feedbackMsg.classList.remove('hidden');
+        }
+
+        if (decoderBox) {
+            decoderBox.classList.remove('shake-error');
+            void decoderBox.offsetWidth; // trigger reflow
+            decoderBox.classList.add('shake-error');
+        }
+
+        passkeyInput.focus();
+        passkeyInput.select();
+    }
+}
+
+function startDecryptedReveal() {
+    const letterBody = document.getElementById('letter-body');
+    const skipBtn = document.getElementById('skip-typing-btn');
+    const paragraphs = (typeof CONFIG !== 'undefined' && CONFIG.letter && Array.isArray(CONFIG.letter.paragraphs)) 
+        ? CONFIG.letter.paragraphs 
+        : [];
+
+    if (letterBody) {
+        letterBody.classList.remove('cipher-scrambled');
+        letterBody.innerHTML = '';
+    }
+
+    if (skipBtn) {
+        skipBtn.textContent = '⚡ Skip to Full Letter';
+        skipBtn.classList.remove('hidden');
+    }
+
+    isLetterTyping = true;
+    let pIdx = 0;
+
+    function typeDecryptedParagraph() {
+        if (pIdx >= paragraphs.length) {
+            finishDecryptedLetter(false);
+            return;
+        }
+
+        const pText = paragraphs[pIdx];
+        const pElem = document.createElement('p');
+        if (letterBody) letterBody.appendChild(pElem);
+
+        let charIdx = 0;
+        function typeChar() {
+            if (charIdx < pText.length) {
+                charIdx++;
+                pElem.innerHTML = escapeHTML(pText.substring(0, charIdx)) + '<span class="typing-cursor">|</span>';
+                if (charIdx % 3 === 0) playTypewriterTick();
+                letterTypingTimer = setTimeout(typeChar, 16 + Math.random() * 12);
+            } else {
+                pElem.innerHTML = escapeHTML(pText);
+                pIdx++;
+                letterTypingTimer = setTimeout(typeDecryptedParagraph, 280);
+            }
+        }
+        typeChar();
+    }
+
+    letterTypingTimer = setTimeout(typeDecryptedParagraph, 400);
+}
+
+function finishDecryptedLetter(wasSkipped = false) {
     isLetterTyping = false;
     clearTimeout(letterTypingTimer);
 
-    const letterSalutation = document.getElementById('letter-salutation');
     const letterBody = document.getElementById('letter-body');
     const letterClosing = document.getElementById('letter-closing');
     const letterPolaroids = document.getElementById('letter-polaroids');
@@ -892,19 +1077,16 @@ function finishLetterTypewriting(wasSkipped = false) {
 
     if (skipBtn) skipBtn.classList.add('hidden');
 
-    const salutationText = (typeof CONFIG !== 'undefined' && CONFIG.letter && CONFIG.letter.salutation) 
-        ? CONFIG.letter.salutation 
-        : "Dearest,";
     const paragraphs = (typeof CONFIG !== 'undefined' && CONFIG.letter && Array.isArray(CONFIG.letter.paragraphs)) 
         ? CONFIG.letter.paragraphs 
         : [];
 
-    if (letterSalutation) letterSalutation.innerHTML = escapeHTML(salutationText);
     if (letterBody) {
+        letterBody.classList.remove('cipher-scrambled');
         letterBody.innerHTML = paragraphs.map(p => `<p>${escapeHTML(p)}</p>`).join('');
     }
 
-    // Reveal closing, polaroids, and memories CTA
+    // Reveal closing, polaroids, and wheel CTA
     if (letterClosing) letterClosing.classList.remove('hidden');
     if (letterPolaroids) letterPolaroids.classList.remove('hidden');
     if (letterCta) letterCta.classList.remove('hidden');
@@ -915,14 +1097,14 @@ function finishLetterTypewriting(wasSkipped = false) {
     // Celebration
     if (typeof confetti === 'function') {
         confetti({
-            particleCount: 30,
-            spread: 60,
-            origin: { y: 0.7 },
-            colors: ['#ff0040', '#ff2b66', '#ffd166']
+            particleCount: 45,
+            spread: 75,
+            origin: { y: 0.65 },
+            colors: ['#ff0040', '#ff2b66', '#ffd166', '#2ed573']
         });
     }
 
-    showToast(wasSkipped ? "⚡ Full letter revealed! Chapter III Fun Wheel unlocked! 🎡" : "✨ Letter finished! Chapter III Fun Wheel unlocked! 🎡");
+    showToast(wasSkipped ? "⚡ Full letter revealed! Chapter III Fun Wheel unlocked! 🎡" : "✨ Letter fully decrypted! Chapter III Fun Wheel unlocked! 🎡");
 }
 
 // --------------------------------------------------------------------------

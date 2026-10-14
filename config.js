@@ -49,18 +49,27 @@ const CONFIG = {
     musicPath: "", 
 
     // ------------------------------------------
-    // 4. Letter Content (Section 2)
+    // 4. Letter Content & Secret Cipher (Section 2)
     // ------------------------------------------
     letter: {
         salutation: "Dearest,",
+
+        // 1. Incomprehensible / Encrypted Scrambled Cipher Text (Shown initially):
+        // You can customize this or paste whatever scrambled text/symbols you want!
+        cipherText: [
+           "Zofu BDBDHYNH,Tiqpp HimbidreTciokj lom jfiem wdbi mv chzv uidks rmse kuubp serrlt iqpikcdiue zz. Nzdfr wklo Q xaj gljvf aej u xiseu lom uf lzqe v zfac yinbfr sktoms ie laxb to pkac tptj uf gwwe ku yjc bkbgI cwqe puum zflrzijvthzv lvaus rtd twv bv nakxzAcyo ywo't sk a wqucy gny ionfe oopfrj g ljb, lieja acdkj uvzz uhv zykm pf gkrnwo yfa wvvu tf heTmbh Z gm owp nvc fjz blc zhda xrzziio goi utcmss jnio, Q iogk io ebs xuoy *ksyztg zupjz*Lrju uhv iojtfsk vemapn puu fvpw *jzygqth xranafs vsoeq*"
+        ],
+
+        // 2. Secret Passkey (To be given by Kireeti):
+        // Change this to whatever passkey Kireeti will give to her!
+        secretCode: "bargavi",
+
+        // 3. Real, Heartwarming Letter (Decrypted & revealed after entering the code):
         paragraphs: [
-            "Happy Birthday to someone who brings so much light, laughter, and genuine warmth into all our lives! On this special day, we wanted to create something truly unique together just for you to celebrate how wonderful and irreplaceable you are.",
-            "Through every high and low, every late-night conversation, and all the crazy, silly moments we've shared, having you as our best friend has been one of our greatest blessings. Your kindness, your spirit, and your smile make our world a much brighter place.",
-            "May this upcoming year bring you endless happiness, boundless adventures, success in everything your heart desires, and memories that make you smile whenever you look back.",
-            "Never forget how truly valued, appreciated, and cherished you are by all three of us. Happy Birthday! ❤️"
+            "Yooo BITCHHHH,Yappy Birthday.Thanks for being with me when times were tough really appreciate it. Never felt I was alone and u cared for me like a real sister better in fact so yeah lots of love to you akka I hope your relationship lasts and you be happy.Also don't be a bitch and annoy others a lot, kinda fucks over the type of person you want to beYeah I am too new for all this writing for others shit, I hope it was good * crying emoji *From the coolest person you know * stylish glasses emoji *"
         ],
         signOff: "With all our love and warmest wishes,",
-        signature: "Dinesh, Kireeti & Bhargavi"
+        signature: ""
     },
 
     // ------------------------------------------

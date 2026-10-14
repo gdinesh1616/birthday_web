@@ -227,17 +227,43 @@
                             <span class="ornament">✦ ✦ ✦</span>
                         </div>
 
+                        <!-- Cipher Status Banner -->
+                        <div class="cipher-status-banner" id="cipher-status-banner">
+                            <span class="cipher-icon">🔒</span>
+                            <span class="cipher-badge-text" id="cipher-badge-text">CIPHER ENCRYPTED MESSAGE</span>
+                        </div>
+
                         <div class="letter-salutation" id="letter-salutation">
                             Dearest,
                         </div>
 
                         <div class="letter-body" id="letter-body">
-                            <!-- Injected by script.js with typewriter effect -->
+                            <!-- Injected by script.js with encrypted or decrypted text -->
+                        </div>
+
+                        <!-- Cipher Decoder Console -->
+                        <div class="cipher-decoder-box" id="cipher-decoder-box">
+                            <div class="decoder-header">
+                                <span class="decoder-icon">⚡</span>
+                                <p class="decoder-hint">
+                                    This letter is locked by an encryption cipher! Ask <strong class="neon-text-gold">Kireeti</strong> for the secret passkey.
+                                </p>
+                            </div>
+                            <form class="decoder-form" id="decoder-form">
+                                <div class="decoder-input-group">
+                                    <input type="text" id="cipher-passkey-input" class="cipher-input" placeholder="Ask Kireeti for passkey..." autocomplete="off" spellcheck="false" required>
+                                    <button type="submit" class="btn-neon btn-decrypt" id="btn-decrypt-letter">
+                                        <span class="btn-icon">🔓</span>
+                                        <span>Decrypt Letter</span>
+                                    </button>
+                                </div>
+                                <div class="decoder-feedback hidden" id="decoder-feedback-msg"></div>
+                            </form>
                         </div>
 
                         <div class="letter-closing hidden" id="letter-closing">
-                            <p id="letter-signoff">With all our love and warmest wishes,</p>
-                            <h3 class="letter-signature" id="letter-signature">Dinesh, Kireeti &amp; Bhargavi</h3>
+                            <p id="letter-signoff">With all our love and warmest wishes</p>
+                            <h3 class="letter-signature" id="letter-signature">"<3"</h3>
                         </div>
 
                         <div class="letter-decorations-bottom">
